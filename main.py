@@ -1,5 +1,7 @@
 import tkinter as tk
 
+from openpyxl import load_workbook
+
 import database
 
 
@@ -33,8 +35,14 @@ def create_window():
 if __name__ == "__main__":
     #create_window()
 
-    # TODO, make the album thing into a Tuple of (name, date)
-    database.add_artist("Rammstein", [("Herzeleid", "1984"), ("Sehnsucht", "1984")])
-    database.add_artist("System of a Down", [("System of a Down", "1998"), ("Toxicity", "2001"), ("Steal This Album", "2002"), ("Mesmerize", "2005"), ("Hypnotize", "2005")])
-    database.add_artist("Anthrax", [("Fistful of metal", "1984"), ("Spreading The Disease", "1984"), ("Among The Living", "1984")])
+    # TODO, make the album thing into a Tuple of (name, date), or every better, make a data structure
+    database.add_artist("Anthrax")
+    database.add_artist("System of a Down")
+    database.add_artist("Meshuggah")
+    database.add_artist("Dream Theater")
+    database.add_artist("TOOL")
 
+    workbook = load_workbook("test.xlsx")
+    sheet = workbook.active
+    result = database.find_artist(sheet, "Meshuggah")
+    print(result)
