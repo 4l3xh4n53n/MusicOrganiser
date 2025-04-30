@@ -12,9 +12,7 @@ def migrate():
     print("Migrating to database.")
 
     # Create an empty "JSON" object
-    music_data = [
-
-    ]
+    music_data = []
 
     # Open the sheet
     workbook = load_workbook("Checklist.xlsx")
@@ -57,7 +55,6 @@ def migrate():
                 },
                 "markers": row[9].value,
                 "notes": row[10].value
-
             }
 
         # If cell contains album type
@@ -76,7 +73,7 @@ def migrate():
         # If cell contains an album
         elif cell_color == "FFDEE6EF":
 
-            album_json = { # todo, change these to true and false
+            album_json = {
                 "title": cell1.value,
                 "date": row[1].value,
                 "downloading": row[2].value.lower() == "y",
@@ -106,7 +103,7 @@ def migrate():
 
     client = MongoClient("mongodb://test:test@localhost:27017/")
     db = client.music.music
-    db.create_index("name", unique=True) # Allows for quick search of the name field todo not sure it does a lot
+    db.create_index("name", unique=True) # Allows for quick search of the name field
 
     try:
         db.insert_many(music_data)

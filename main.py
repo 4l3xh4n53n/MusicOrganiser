@@ -1,9 +1,21 @@
 import tkinter as tk
 
-from openpyxl import load_workbook
+"""
+Regarding Notes:
+Put simply, they are notes, you can write anything you want
+Regarding Markers:
+These markers mean there is an issue with something
+D - Date
+N - Name
+C - Cover
+A - Album
+B - Artist 
 
-import database
-
+These markers show intentions or improvements:
+G - Get this album/artist
+F - Finish this discography
+E - Download included extra content that is worth checking out
+"""
 
 def create_window():
     window = tk.Tk()
@@ -33,16 +45,6 @@ def create_window():
     window.mainloop()
 
 if __name__ == "__main__":
-    #create_window()
+    create_window()
+    #migrate_spreadsheet.migrate()
 
-    # TODO, make the album thing into a Tuple of (name, date), or every better, make a data structure
-    database.add_artist("Anthrax")
-    database.add_artist("System of a Down")
-    database.add_artist("Meshuggah")
-    database.add_artist("Dream Theater")
-    database.add_artist("TOOL")
-
-    workbook = load_workbook("test.xlsx")
-    sheet = workbook.active
-    result = database.find_artist(sheet, "Meshuggah")
-    print(result)

@@ -42,6 +42,8 @@ def get_album(artist_query:str, album_query:str):
     artist_data = get_artist(artist_query)
     album_list = artist_data.get("albums")
 
+    # Search all subtypes in the albums list until the album with the correct title is found
+
     for album_type in ALBUM_LOCATIONS:
         album_type_list = album_list.get(album_type)
         for album in album_type_list:
@@ -81,8 +83,9 @@ def add_album(artist:str, album_type:str , album:str, year:str, downloading:bool
     album_json = {
         "title": album,
         "date": year,
+        # The option to set the album to downloading is given to save database calls and make things faster
         "downloading": downloading,
-        "downloaded": False,  # This isn't integrated yet
+        "downloaded": False,
         "tags": False,
         "cover": False,
         "replay_gain": False,
@@ -118,6 +121,7 @@ def change_status(artist:str, album_type:str, album:str,
                   markers:Optional[str]=None,
                   notes:Optional[str]=None):
 
+    # List of values that could potentially be passed to the function
     potential_updates = {
         "downloading": downloading, "downloaded": downloaded, "tags": tags, "cover": cover, "replay_gain": replay_gain,
         "server_upload": server_upload, "format": format, "markers": markers, "notes": notes
@@ -141,6 +145,7 @@ def change_artist(artist:str,
                   markers:str=None,
                   notes:str=None):
 
+    # List of values that could potentially be passed to the function
     potential_updates = {
         "markers": markers,
         "notes": notes
@@ -148,6 +153,7 @@ def change_artist(artist:str,
 
     updates = {}
 
+    # Check if a value has been passed to this function, if it has store the value to be updated later
     for field, value in potential_updates.items():
         if value is not None:
             path = f"{field}"
