@@ -33,22 +33,25 @@ def get_artist(artist:str):
     return result
 
 """
+This function gets the albums released under the artist
+"""
+def get_artist_albums(artist:str):
+    return get_artist(artist).get("albums")
+
+"""
 This function takes the name of an artist and an album and returns the album information
 The reason the artist needs to be passed to the function is because it makes the search
 more specific, meaning we do not need to handle any similar album names belonging to 
 multiple artists, and don't need to make overly complicated queries to the database.
 """
-def get_album(artist_query:str, album_query:str):
-    artist_data = get_artist(artist_query)
-    album_list = artist_data.get("albums")
+def get_album(artist:str, album_query:str):
+    album_list = get_artist_albums(artist)
 
     # Search all subtypes in the albums list until the album with the correct title is found
 
-    for album_type in ALBUM_LOCATIONS:
-        album_type_list = album_list.get(album_type)
-        for album in album_type_list:
-            if album.get("title") == album_query:
-                return album
+    for album in album_list:
+        if album.get("title").lower() == album_query.lower():
+            return album
 
     return None
 
@@ -61,13 +64,7 @@ def add_artist(artist:str, markers:str = None, notes:str = None):
     with connect_to_database() as db:
         db.insert_one({
             "name": artist,
-            "albums": {
-                "studio_albums": [],
-                "eps": [],
-                "compilation_albums": [],
-                "cover_albums": [],
-                "singles": [],
-            },
+            "albums": [],
             "markers": markers,
             "notes": notes
         })
@@ -110,7 +107,8 @@ This function changes data values
 For example, the status of whether or not an album is downloading can be changed to yes or no
 it can also change notes and markers
 """
-def change_status(artist:str, album_type:str, album:str,
+def change_status(artist:str, album:str,
+                  album_type:Optional[str]=None,
                   downloading:Optional[bool]=None,
                   downloaded:Optional[bool]=None,
                   tags:Optional[bool]=None,
@@ -123,15 +121,15 @@ def change_status(artist:str, album_type:str, album:str,
 
     # List of values that could potentially be passed to the function
     potential_updates = {
-        "downloading": downloading, "downloaded": downloaded, "tags": tags, "cover": cover, "replay_gain": replay_gain,
-        "server_upload": server_upload, "format": format, "markers": markers, "notes": notes
+        "type": album_type, "downloading": downloading, "downloaded": downloaded, "tags": tags, "cover": cover,
+        "replay_gain": replay_gain, "server_upload": server_upload, "format": format, "markers": markers, "notes": notes
     }
 
     updates = {}
 
     for field, value in potential_updates.items():
         if value is not None:
-            path = f"albums.{album_type}.$[elem].{field}"
+            path = f"albums.$[elem].{field}"
             updates[path] = value
 
     with connect_to_database() as db:
@@ -156,17 +154,71 @@ def change_artist(artist:str,
     # Check if a value has been passed to this function, if it has store the value to be updated later
     for field, value in potential_updates.items():
         if value is not None:
-            path = f"{field}"
-            updates[path] = value
+            updates[field] = value
 
     with connect_to_database() as db:
         db.update_one({"name": artist}, {"$set": updates})
 
 
-# TODO, we need some functions to find albums or artists that are missing stuff or have certain markers
+def get_artists_matching_criteria(markers:str):
+    with connect_to_database() as db:
+        result = db.find({"markers" : {"$regex" : markers}})
+        result = list(result)
+    return result
 
-def get_artists_matching_criteria():
-    pass
 
-def get_albums_matching_criteria():
-    pass
+def get_albums_matching_criteria( # todo find a way to exclude format
+        downloading:Optional[bool]=None,
+        downloaded:Optional[bool]=None,
+        tags:Optional[bool]=None,
+        cover:Optional[bool]=None,
+        replay_gain:Optional[bool]=None,
+        server_upload:Optional[bool]=None,
+        format:Optional[str]=None,
+        markers:Optional[str]=None,
+        notes:Optional[str]=None):
+
+    potential_filters = {
+        "downloading": downloading, "downloaded": downloaded, "tags": tags, "cover": cover, "replay_gain": replay_gain,
+        "server_upload": server_upload, "format": format, "markers": markers,
+        "notes": notes
+    }
+
+    filters = []
+    projection_filters = [] # A second set of filters formatted differently
+    # Sorry this code sucks
+
+    for field, value in potential_filters.items():
+        if value is not None:
+            filters.append({f"albums.{field}": value})
+            projection_filters.append({"$eq":[f"$$album.{field}", value]})
+
+    pipeline = [
+        # This filters down to only artists with matching albums
+        {
+            "$match": {
+                "$and": filters
+            }
+        },
+        # This filters down the artists and albums to only include matching albums
+        {
+            "$project": {
+                "_id": 0,
+                "name": 1,
+                "albums": {
+                    "$filter": {
+                        "input": "$albums",
+                        "as": "album",
+                        "cond": {
+                            "$and": projection_filters
+                        }
+                    }
+                }
+            }
+        }
+    ]
+
+    with connect_to_database() as db:
+        results = list(db.aggregate(pipeline))
+    return results
+

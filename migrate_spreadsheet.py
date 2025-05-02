@@ -40,19 +40,13 @@ def migrate():
 
             artist = cell1.value
             # Studio albums come first in the spreadsheet and have no header
-            current_album_type = "studio_albums"
+            current_album_type = "studio_album"
 
             # Set blank template to be used later
 
             current_artist = {
                 "name": artist,
-                "albums": {
-                    "studio_albums": [],
-                    "eps": [],
-                    "compilation_albums": [],
-                    "cover_albums": [],
-                    "singles": [],
-                },
+                "albums": [],
                 "markers": row[9].value,
                 "notes": row[10].value
             }
@@ -61,13 +55,16 @@ def migrate():
         elif cell_color == "FFFF972F":
             current_album_type = cell1.value.lower()
 
-            # Some names in the spreadsheet need changing before they can be stored in the JSON
+            # Convert names to be singular before being stored in the JSON
             match current_album_type:
+                case "eps":
+                    current_album_type = "ep"
                 case "compilations":
-                    current_album_type = "compilation_albums"
-
+                    current_album_type = "compilation_album"
                 case "covers":
-                    current_album_type = "cover_albums"
+                    current_album_type = "cover_album"
+                case "singles":
+                    current_album_type = "single"
 
 
         # If cell contains an album
@@ -75,6 +72,7 @@ def migrate():
 
             album_json = {
                 "title": cell1.value,
+                "type": current_album_type,
                 "date": row[1].value,
                 "downloading": row[2].value.lower() == "y",
                 "downloaded": row[3].value.lower() == "y", # This isn't integrated yet
@@ -88,7 +86,7 @@ def migrate():
             }
 
             # append to list of current album type!
-            current_artist["albums"][current_album_type].append(album_json)
+            current_artist["albums"].append(album_json)
 
         # If an unexpected cell colour arrives
         else:
