@@ -4,8 +4,6 @@ from typing import Collection, Optional
 import pymongo.errors
 from pymongo import MongoClient
 
-from constants import ALBUM_LOCATIONS
-
 """
 This function allows you to connect and query the database
 """

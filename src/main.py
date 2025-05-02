@@ -46,5 +46,5 @@ def create_window():
 
 if __name__ == "__main__":
     create_window()
-    #migrate_spreadsheet.migrate()
+
 
