@@ -5,13 +5,15 @@ from src.data.database import connect_to_database
 class Artist:
     albums = []
 
-    def __init__(self, name, albums = None, notes = None, markers = None):
+    def __init__(self, name, albums = None, notes = None, markers = None, _id = None):
         self.name = name
         self.notes = notes
         self.markers = markers
+        self.albums = []
+        self._id = _id
         if albums is not None:
             for album in albums:
-                Album.from_dict(album)
+                self.albums.append(Album.from_dict(album))
 
 
     @classmethod
@@ -21,10 +23,10 @@ class Artist:
             if data is None:
                 return None
 
-        return cls(name, data.get("albums"), data.get("notes"), data.get("markers"))
+        return cls(name, data.get("albums"), data.get("notes"), data.get("markers"), data.get("_id"))
 
 
-    def get_album(self, name):
+    def get_album(self, name:str):
         for album in self.albums:
             if album.title.lower() == name.lower():
                 return album
@@ -32,29 +34,49 @@ class Artist:
         return None
 
 
-    def add_album(self, album:Album): # todo, should this be changed to add albums? or a separate func be made?
+    def get_albums_json(self):
+        json = []
+        for album in self.albums:
+            json.append(album.to_dict())
+        return json
+
+
+    def add_album(self, album:Album):
         self.albums.append(album)
 
 
+    def add_albums(self, albums:list[Album]):
+        for album in albums:
+            self.albums.append(album)
+
+
     def to_dict(self):
-
-        albums_as_dict = []
-
-        for album in self.albums:
-            albums_as_dict.append(album.to_dict())
-
         return {
+            "_id": self._id,
             "name": self.name,
-            "albums": self.albums,
+            "albums": self.get_albums_json(),
             "notes": self.notes,
             "markers": self.markers,
         }
 
 
     def save(self):
-        pass
-        # todo, check database for me
-        # todo, either update or insert me
+        with connect_to_database() as db:
+            if self._id is None: # Artist does not exist in the database. Create a new one
+                db.insert_one({
+                    "name": self.name,
+                    "albums": self.albums,
+                    "markers": self.markers,
+                    "notes": self.notes
+                })
+            else: # Artist already exists in the database
+                db.replace_one({"_id": self._id},{
+                    "name": self.name,
+                    "albums": self.albums,
+                    "markers": self.markers,
+                    "notes": self.notes
+                })
+
 
 
 
