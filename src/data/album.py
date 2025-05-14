@@ -3,12 +3,13 @@ class Album:
     Represents a music album and stores any useful metadata and processing status
     """
 
-    def __init__(self, title: str, date: int, downloading: bool, downloaded: bool, tags: bool, cover: bool,
-                 replay_gain: bool, server_upload: bool, audio_format: str, markers: str, notes: str):
+    def __init__(self, title: str, album_type: str, date: int, downloading: bool, downloaded: bool, tags: bool,
+                 cover: bool, replay_gain: bool, server_upload: bool, audio_format: str, markers: str, notes: str):
         """
         Initialises a new Album instance
 
         :param title: The title of the Album
+        :param album_type: studio_album, ep, compilation_album, cover_album, single
         :param date: The release year of the Album
         :param downloading: True the album is in the process of downloading, False otherwise
         :param downloaded: True if the album download is complete, False otherwise
@@ -21,6 +22,7 @@ class Album:
         :param notes: Any additional notes
         """
         self.title = title
+        self.type = album_type
         self.date = date
         self.downloading = downloading
         self.downloaded = downloaded
@@ -44,6 +46,7 @@ class Album:
         """
         return cls(
             data.get("title"),
+            data.get("type"),
             data.get("date"),
             data.get("downloading"),
             data.get("downloaded"),
@@ -65,6 +68,7 @@ class Album:
         """
         return {
             "title": self.title,
+            "type": self.type,
             "date": self.date,
             "downloading": self.downloading,
             "downloaded": self.downloaded,

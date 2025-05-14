@@ -3,6 +3,7 @@ from src.data.album import Album
 
 test_album = {
             "title": "test_title",
+            "type": "studio_album",
             "date": 1984,
             "downloading": False,
             "downloaded": True,

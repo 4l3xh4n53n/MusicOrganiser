@@ -8,6 +8,7 @@ from tests.test_album import test_album
 def create_test_album():
     return Album(
         "test_title",
+        "studio_album",
         1984,
         False,
         True,
