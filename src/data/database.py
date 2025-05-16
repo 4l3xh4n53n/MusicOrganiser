@@ -5,6 +5,8 @@ from warnings import deprecated
 import pymongo.errors
 from pymongo import MongoClient
 
+artist_list = None
+
 """
 This function allows you to connect and query the database
 """
@@ -19,6 +21,31 @@ def connect_to_database() -> Collection:
         print(f"Error: {error}")
     finally:
         client.close()
+
+
+def filter_artist_list(search_term:str):
+    """
+    This can filter the list of artists gotten from get_artist_list
+    :param search_term: filter
+    :return: Filtered list of artists
+    """
+    global artist_list
+    return [
+        name for name in artist_list if search_term.lower() in name.lower()
+    ]
+
+def get_artist_list():
+    """
+    Gets the list of all current artists in the database
+    This can be useful for selecting artists, or for comparison when making new artists
+    :return: List of artists
+    """
+    global artist_list
+    if artist_list is None:
+        with connect_to_database() as db:
+            artist_list = db.distinct("name")
+
+    return artist_list
 
 
 def get_artists_matching_criteria(markers:str):
