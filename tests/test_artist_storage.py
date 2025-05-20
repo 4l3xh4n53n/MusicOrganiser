@@ -1,18 +1,13 @@
-import mongomock
-
 from src.data import artist_storage, database
-from src.data.artist import Artist
+from tests.conftest import setup_mock_db, make_test_artist
 
+patch_target = "src.data.artist.connect_to_database"
 
 class TestArtistStorage:
 
     def test_get_artist(self, mocker):
-        collection = mongomock.MongoClient().music.music
-        collection.insert_one({"name": "test_name", "albums": [], "notes": "Test notes", "markers": "G,E"})
-        context_manager = mocker.MagicMock()
-        context_manager.__enter__.return_value = collection
-        context_manager.__exit__.return_value = None
-        mocker.patch("src.data.artist.connect_to_database", return_value=context_manager)
+        setup_mock_db(mocker, patch_target,
+                      {"name": "test_name", "albums": [], "notes": "Test notes", "markers": "G,E"})
 
         # Get an artist from the database
         artist1 = artist_storage.get_artist("test_name")
@@ -24,7 +19,7 @@ class TestArtistStorage:
         assert artist2 is artist1
 
     def test_add_artist(self):
-        test_artist = Artist("test_name", [], "test_notes")
+        test_artist = make_test_artist()
         artist_storage.add_artist(test_artist)
 
         assert test_artist in artist_storage.artists

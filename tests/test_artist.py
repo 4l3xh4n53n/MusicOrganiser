@@ -1,39 +1,14 @@
-import mongomock
-
-from src.data.album import Album
 from src.data.artist import Artist
-from tests.test_album import test_album
+from tests.conftest import make_test_album, make_test_artist, setup_mock_db
 
 
-def create_test_album():
-    return Album(
-        "test_title",
-        "studio_album",
-        1984,
-        False,
-        True,
-        True,
-        False,
-        True,
-        False,
-        "FLAC",
-        "G,E",
-        "Test notes"
-    )
-
-def create_test_artist():
-    return Artist("test_name", notes="Test notes")
+patch_target = "src.data.artist.connect_to_database"
 
 class TestArtist:
 
-
     def test_from_database(self, mocker):
-        collection = mongomock.MongoClient().music.music
-        collection.insert_one({"name": "test_name", "albums": [test_album],"notes": "Test notes", "markers": "G,E"})
-        context_manager = mocker.MagicMock()
-        context_manager.__enter__.return_value = collection
-        context_manager.__exit__.return_value = None
-        mocker.patch("src.data.artist.connect_to_database", return_value = context_manager)
+        setup_mock_db(mocker, patch_target,
+                      {"name": "test_name", "albums": [],"notes": "Test notes", "markers": "G,E"})
 
         result = Artist.from_database("test_name")
 
@@ -45,22 +20,20 @@ class TestArtist:
 
 
     def test_add_albums(self):
-        artist = create_test_artist()
-        album = create_test_album()
-        album2 = create_test_album()
-        album2.title = "test_title_2"
+        artist = make_test_artist()
+        album = make_test_album(title="test_title_1")
+        album2 = make_test_album(title="test_title_2")
 
         artist.add_albums([album, album2])
 
-        assert artist.get_album("test_title") is album
+        assert artist.get_album("test_title_1") is album
         assert artist.get_album("test_title_2") is album2
 
 
     def test_get_albums_json(self):
-        artist = create_test_artist()
-        album = create_test_album()
-        album2 = create_test_album()
-        album2.title = "test_title_2"
+        artist = make_test_artist()
+        album = make_test_album(title="test_title_1")
+        album2 = make_test_album(title="test_title_2")
         artist.add_albums([album, album2])
 
         json = [album.to_dict(), album2.to_dict()]
@@ -69,27 +42,25 @@ class TestArtist:
 
 
     def test_get_album(self):
-        artist = create_test_artist()
-        album = create_test_album()
+        artist = make_test_artist()
+        album = make_test_album(title="test_title")
+
         artist.add_album(album)
+
         assert artist.get_album("test_title") is album
 
 
-    def test_to_dict(self):
-        artist = create_test_artist()
-        assert artist.to_dict() == {"_id": None, "name": "test_name", "albums":[], "notes": "Test notes", "markers": None}
+    def test_to_dict(self, test_artist_data):
+        artist = make_test_artist()
 
+        assert artist.to_dict() == test_artist_data
 
     def test_save(self, mocker):
-        collection = mongomock.MongoClient().music.music
-        context_manager = mocker.MagicMock()
-        context_manager.__enter__.return_value = collection
-        context_manager.__exit__.return_value = None
-        mocker.patch("src.data.artist.connect_to_database", return_value=context_manager)
+        collection = setup_mock_db(mocker, patch_target)
 
         # Create a fresh new Artist object and save it to the database
 
-        artist = create_test_artist()
+        artist = make_test_artist(name="test_name")
         artist.save()
 
         # After saving the new artist to the database it should have an ID
