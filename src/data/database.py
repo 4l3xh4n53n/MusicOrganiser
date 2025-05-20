@@ -1,17 +1,21 @@
 from contextlib import contextmanager
 from typing import Collection, Optional
-from warnings import deprecated
 
 import pymongo.errors
 from pymongo import MongoClient
 
-artist_list = None
+artist_list: list[str] = None
+"""
+The purpose of the artist_list is to have a list of artists that can be selected 
+from a menu that can then be used for manipulating the artist and associated albums
+"""
 
-"""
-This function allows you to connect and query the database
-"""
+
 @contextmanager
 def connect_to_database() -> Collection:
+    """
+    This function allows you to connect to and query the database
+    """
     client = None
     try:
         client = MongoClient("mongodb://test:test@localhost:27017/")
@@ -34,6 +38,7 @@ def filter_artist_list(search_term:str):
         name for name in artist_list if search_term.lower() in name.lower()
     ]
 
+
 def get_artist_list():
     """
     Gets the list of all current artists in the database
@@ -49,6 +54,11 @@ def get_artist_list():
 
 
 def get_artists_matching_criteria(markers:str):
+    """
+    Gets a list of artists matching a certain criteria, the only criteria for Artists is markers
+    :param markers: Tracking markers
+    :return: A list of artists that match the criteria in JSON format
+    """
     with connect_to_database() as db:
         result = db.find({"markers" : {"$regex" : markers}})
         result = list(result)
@@ -65,6 +75,11 @@ def get_albums_matching_criteria( # todo find a way to exclude format
         format:Optional[str]=None,
         markers:Optional[str]=None,
         notes:Optional[str]=None):
+    """
+    Gets a list of albums matching a certain criteria
+    For parameters, see the documentation in artist.py
+    :return: A list of albums that match the criteria in JSON format
+    """
 
     potential_filters = {
         "downloading": downloading, "downloaded": downloaded, "tags": tags, "cover": cover, "replay_gain": replay_gain,

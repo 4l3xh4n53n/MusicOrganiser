@@ -1,6 +1,9 @@
 from src.data.artist import Artist
 
-artists = []
+artists: list[Artist] = []
+"""
+The purpose of artists is to act as a local cache for Artist objects 
+"""
 
 
 def get_artist(artist_name:str):
@@ -21,8 +24,9 @@ def get_artist(artist_name:str):
     artists.append(artist)
     return artist
 
-"""
-This function adds an artist object to the local list of artists
-"""
+
 def add_artist(artist:Artist):
+    """
+    This function adds an artist object to the local artist cache
+    """
     artists.append(artist)

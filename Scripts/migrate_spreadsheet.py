@@ -15,7 +15,7 @@ def migrate():
     music_data = []
 
     # Open the sheet
-    workbook = load_workbook("../Checklist.xlsx")
+    workbook = load_workbook("./Checklist.xlsx")
     sheet = workbook.active
 
     current_artist = None
@@ -111,3 +111,5 @@ def migrate():
     finally:
         client.close()
 
+
+migrate()
