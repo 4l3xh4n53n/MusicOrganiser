@@ -4,9 +4,15 @@ from tests.conftest import make_test_album, make_test_artist, setup_mock_db
 
 patch_target = "src.data.artist.connect_to_database"
 
+
 class TestArtist:
 
+
     def test_from_database(self, mocker):
+        """
+        Artist.from_database() is supposed to take an artists name and get the corresponding artist
+        data from the database and build an Artist object using that data.
+        """
         setup_mock_db(mocker, patch_target,
                       {"name": "test_name", "albums": [],"notes": "Test notes", "markers": "G,E"})
 
@@ -20,7 +26,12 @@ class TestArtist:
 
 
     def test_add_albums(self):
-        artist = make_test_artist()
+        """
+        Artist.add_albums() is supposed to take a list of Albums and add them to the artists list
+        of Albums. The function itself uses the Artist.add_album() function, so this test also tests
+        that indirectly.
+        """
+        artist = make_test_artist(albums=[])
         album = make_test_album(title="test_title_1")
         album2 = make_test_album(title="test_title_2")
 
@@ -31,7 +42,10 @@ class TestArtist:
 
 
     def test_get_albums_json(self):
-        artist = make_test_artist()
+        """
+        Artist.get_albums_json() is supposed to return the list of Albums but in JSON/dict format.
+        """
+        artist = make_test_artist(albums=[])
         album = make_test_album(title="test_title_1")
         album2 = make_test_album(title="test_title_2")
         artist.add_albums([album, album2])
@@ -42,7 +56,11 @@ class TestArtist:
 
 
     def test_get_album(self):
-        artist = make_test_artist()
+        """
+        Artist.get_album() is supposed to take an album name and get that album from the artists
+        list of Albums.
+        """
+        artist = make_test_artist(albums=[])
         album = make_test_album(title="test_title")
 
         artist.add_album(album)
@@ -51,11 +69,22 @@ class TestArtist:
 
 
     def test_to_dict(self, test_artist_data):
+        """
+        This function turns the Artist object (and Albums) into a JSON/dict object.
+        """
         artist = make_test_artist()
 
-        assert artist.to_dict() == test_artist_data
+        assert artist.to_dict() == test_artist_data # make_test_artist() uses test_artist_data to construct the Artist
+
 
     def test_save(self, mocker):
+        """
+        Artist.save() is supposed to save the Artist object to the database in a JSON format.
+        The function is supposed to figure out whether the artist already exists in the database, to do
+        this it uses the _id value, anything not in the database will not have an _id.
+        If it is not in the database it will save a new to the database, if it is in the database it will
+        update the document in the database.
+        """
         collection = setup_mock_db(mocker, patch_target)
 
         # Create a fresh new Artist object and save it to the database
@@ -83,3 +112,4 @@ class TestArtist:
         assert original == artist.to_dict() # Ensure it is saved correctly
         assert artist3.get("_id") == database_id # Ensure its saved consistently
         assert collection.count_documents({}) == 1 # Ensure no duplicates
+
