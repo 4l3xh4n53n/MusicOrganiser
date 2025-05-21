@@ -2,13 +2,16 @@ import tkinter as tk
 from tkinter import SINGLE
 
 from src.data.database import filter_artist_list, get_artist_list
+from src.ui.manual_editing.data_editing_panel import DataEditingPanel
 
 
 class ArtistSelectorPanel:
 
     selected_artist = ""
 
-    def __init__(self, window:tk.Tk):
+    def __init__(self, window:tk.Tk, data_editing_panel: DataEditingPanel):
+        self.data_editing_panel = data_editing_panel
+
         # Make a frame to contain the selection panel elements
 
         artist_selector = tk.Frame(window)
@@ -77,7 +80,5 @@ class ArtistSelectorPanel:
         listbox = event.widget
         selected_index = listbox.nearest(event.y)
         self.selected_artist = listbox.get(selected_index)
-        print(self.selected_artist) # todo, not sure what to do from here
-        # do we set it as a global variable here>
-        # or do we call the other side of the screen?
-        # Probably the latter
+        self.data_editing_panel.set_selected_artist(self.selected_artist)
+

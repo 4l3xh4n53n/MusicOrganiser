@@ -1,7 +1,7 @@
 import tkinter as tk
 
-from src.ui.manual_editing import data_editing_panel
 from src.ui.manual_editing.artist_selector_panel import ArtistSelectorPanel
+from src.ui.manual_editing.data_editing_panel import DataEditingPanel
 
 
 def create_window():
@@ -9,7 +9,8 @@ def create_window():
     window.maxsize(2000,1000)
     window.geometry("1800x950")
 
-    artist_selector = ArtistSelectorPanel(window)
+    editing_panel = DataEditingPanel(window)
+    ArtistSelectorPanel(window, editing_panel)
 
     tk.mainloop()
 
