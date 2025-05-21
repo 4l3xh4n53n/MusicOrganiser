@@ -1,8 +1,7 @@
 import tkinter as tk
-from tkinter.constants import SINGLE
 
-from src.data.database import filter_artist_list, get_artist_list
-from src.ui.manual_editing import artist_selector_panel
+from src.ui.manual_editing import data_editing_panel
+from src.ui.manual_editing.artist_selector_panel import ArtistSelectorPanel
 
 
 def create_window():
@@ -10,7 +9,7 @@ def create_window():
     window.maxsize(2000,1000)
     window.geometry("1800x950")
 
-    artist_selector_panel.create_panel(window)
+    artist_selector = ArtistSelectorPanel(window)
 
     tk.mainloop()
 
