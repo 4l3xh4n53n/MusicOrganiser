@@ -109,14 +109,14 @@ class Artist:
             if self._id is None: # Artist does not exist in the database. Create a new one
                 db.insert_one({
                     "name": self.name,
-                    "albums": self.albums,
+                    "albums": self.get_albums_json(),
                     "markers": self.markers,
                     "notes": self.notes
                 })
             else: # Artist already exists in the database
                 db.replace_one({"_id": self._id},{
                     "name": self.name,
-                    "albums": self.albums,
+                    "albums": self.get_albums_json(),
                     "markers": self.markers,
                     "notes": self.notes
                 })
