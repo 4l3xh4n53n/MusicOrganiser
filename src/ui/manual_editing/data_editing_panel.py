@@ -1,4 +1,3 @@
-import json
 import tkinter as tk
 from copy import deepcopy
 
@@ -7,9 +6,20 @@ from src.data.artist_storage import get_artist
 
 
 class AlbumFrame:
+    """
+    This class has a reproducible frame that displays each piece of album information and allows users to
+    edit it. This class should only be created from the DataEditingPanel, as that is where it belongs.
+    """
 
 
     def __init__(self, parent_frame, album:Album):
+        """
+        One of these can be made for an Album object, it displays the Albums information and allows it to be
+        edited by the user. These will usually be in a list with multiple other Album Frames to make an
+        artists discography.
+        :param parent_frame: The root object that the list of Albums will be displayed in
+        :param album: The Album object which data is going to be displayed and modified
+        """
         self.original_title = album.title # This is used to identify the album later in-case the title changes
 
         # Make variables
@@ -29,7 +39,7 @@ class AlbumFrame:
         self.markers = tk.StringVar(value=album.markers if album.markers is not None else "")
         self.notes = tk.StringVar(value=album.notes if album.notes is not None else "")
 
-        # Put each album in its own frame
+        # Make a frame for the album
 
         self.frame = tk.Frame(parent_frame)
         self.frame.pack()
@@ -39,7 +49,9 @@ class AlbumFrame:
         album_title = tk.Entry(self.frame, width=30, textvariable=self.title)
         album_type = tk.OptionMenu(self.frame, self.type, *["studio_album", "ep", "compilations", "covers", "singles"])
         album_year = tk.Entry(self.frame, width=6, textvariable=self.year)
-
+        album_format = tk.Entry(self.frame, width=8, textvariable=self.format)
+        album_markers = tk.Entry(self.frame, width=6, textvariable=self.markers)
+        album_notes = tk.Entry(self.frame, width=40, textvariable=self.notes)
 
         # Boolean values
 
@@ -50,12 +62,6 @@ class AlbumFrame:
         album_replay_gain = tk.Checkbutton(self.frame, text="Replay Gain", height=1, width=9, variable=self.replay_gain)
         album_server_upload = tk.Checkbutton(self.frame, text="Server Upload", height=1, width=12, variable=self.server_upload)
 
-        # String values
-
-        album_format = tk.Entry(self.frame, width=8, textvariable=self.format)
-        album_markers = tk.Entry(self.frame, width=6, textvariable=self.markers)
-        album_notes = tk.Entry(self.frame, width=40, textvariable=self.notes)
-
         # Pack all elements
 
         for element in [album_title, album_type, album_year, album_downloading,
@@ -65,9 +71,19 @@ class AlbumFrame:
 
 
 class DataEditingPanel:
+    """
+    This class is the right side of the editing screen. Along the top it has the Artist information that
+    can be edited. Below the Artist information is the list of Albums belonging to that Artist. These can
+    also be modified.
+    """
 
 
     def __init__(self, window:tk.Tk):
+        """
+        This function creates the DataEditingPanel, that is displayed on the right-hand side of the manual
+        editing screen. This does not take an Artist value as the Artist is updated later.
+        :param window: The editing screen
+        """
         self.selected_artist = None
         self.album_frames = []
         data_editor = tk.Frame(window)
@@ -107,6 +123,10 @@ class DataEditingPanel:
 
 
     def send_response_message(self, message:str):
+        """
+        This function puts a message in the response box that is found in the editing panel
+        :param message: The message to be displayed
+        """
         self.response_box.config(state="normal")
         self.response_box.delete("1.0", tk.END)
         self.response_box.insert(tk.END, message)
@@ -114,19 +134,23 @@ class DataEditingPanel:
 
 
     def update_artist_data(self):
+        """
+        This function is called from the "save" button. It will take all Artist and Album data
+        from the editing window and save it to the database.
+        """
         if self.selected_artist is None:
             self.send_response_message("No artist selected")
             return
 
-        # Artist Data
+        # Set the Artist Data
 
         self.selected_artist.name = self.name.get()
         self.selected_artist.markers = self.markers.get()
         self.selected_artist.notes = self.notes.get()
 
-        # Album Data
+        # Set the Data for all albums
 
-        for album_frame in self.album_frames:
+        for album_frame in self.album_frames: # Get each album displayed in the editing panel
             album = self.selected_artist.get_album(album_frame.original_title)
 
             album.title = album_frame.title.get().strip()
@@ -150,14 +174,17 @@ class DataEditingPanel:
 
             new_artist = deepcopy(self.selected_artist)
             new_artist._id = None
-            print(json.dumps(new_artist.to_dict(), indent=2))
 
             self.selected_artist.save()
-
             self.send_response_message("Saved changes.")
 
 
     def set_selected_artist(self, selected_artist_name:str):
+        """
+        This function sets the selected artists, this populates all editor boxes with the Artist
+        data and corresponding Album data and allows them to be edited.
+        :param selected_artist_name: The Artists that is to be edited
+        """
 
         # Set artist data to be empty
 
@@ -182,6 +209,8 @@ class DataEditingPanel:
             self.markers.set(self.selected_artist.markers)
         if self.selected_artist.notes is not None:
             self.notes.set(self.selected_artist.notes)
+
+        # Create an AlbumFrame for each Album and put it in the editor
 
         for album in self.selected_artist.albums:
             frame = AlbumFrame(self.album_editor, album)

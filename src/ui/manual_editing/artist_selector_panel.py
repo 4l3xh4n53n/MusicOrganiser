@@ -6,10 +6,22 @@ from src.ui.manual_editing.data_editing_panel import DataEditingPanel
 
 
 class ArtistSelectorPanel:
+    """
+    This class is the left side of the editing screen. It has three boxes, a search box, a list of Artists
+    and a bookmarks box at the bottom to make it easier to switch back and forth between Artists. Once an
+    Artist has been selected it calls the set_selected_artist() function from the DataEditingPanel class.
+    """
 
     selected_artist = ""
 
+
     def __init__(self, window:tk.Tk, data_editing_panel: DataEditingPanel):
+        """
+        This function creates the ArtistSelectorPanel that is displayed on the left-hand side of the manual
+        editing screen. It allows an Artist to be selected and bookmarked.
+        :param window: The root window that the artist selector will go in
+        :param data_editing_panel: The DataEditingPanel that it will update when an Artist is chosen
+        """
         self.data_editing_panel = data_editing_panel
 
         # Make a frame to contain the selection panel elements
@@ -20,48 +32,57 @@ class ArtistSelectorPanel:
         # Create the window elements
 
         artist_search_box = tk.Entry(artist_selector, width=52)
-        list_of_artists = tk.Listbox(artist_selector, height=34, width=52, selectmode=SINGLE)
+        self.artist_list_box = tk.Listbox(artist_selector, height=34, width=52, selectmode=SINGLE)
         self.bookmarked_artists = tk.Listbox(artist_selector, height=10, width=52, selectmode=SINGLE)
 
-        artist_search_box.bind("<Return>", lambda event: self.artist_search(event, list_of_artists))
+        artist_search_box.bind("<Return>", lambda event: self.filter_artist_list(event))
 
         # Select Artist
 
-        list_of_artists.bind("<Double-1>", lambda event: self.select_artist(event))
+        self.artist_list_box.bind("<Double-1>", lambda event: self.select_artist(event))
         self.bookmarked_artists.bind("<Double-1>", lambda event: self.select_artist(event))
 
         # Bookmarks
 
-        list_of_artists.bind("<Button-3>", lambda event: self.bookmark_artist(event))
+        self.artist_list_box.bind("<Button-3>", lambda event: self.bookmark_artist(event))
         self.bookmarked_artists.bind("<Button-3>", lambda event: self.remove_artist_from_bookmarks(event))
 
         # Pack all items
 
         artist_search_box.pack()
-        list_of_artists.pack()
+        self.artist_list_box.pack()
         self.bookmarked_artists.pack()
 
-        self.set_list_box_contents(list_of_artists, get_artist_list())
+        self.set_artist_list_box_contents(get_artist_list())
 
 
-    def artist_search(self, event, list_of_artists):
+    def filter_artist_list(self, event):
+        """
+        This function takes the value in the search box and filters the artist name list.
+        :param event: Enter button event
+        """
         search_query = event.widget.get()
         artist_list = filter_artist_list(search_query)
-        self.set_list_box_contents(list_of_artists, artist_list)
+        self.set_artist_list_box_contents(artist_list)
 
 
-    @staticmethod
-    def set_list_box_contents(listbox: tk.Listbox, artist_list):
-        listbox.delete(0, tk.END)
+    def set_artist_list_box_contents(self, artist_list: list[str]):
+        """
+        Changes the displayed list of Artists.
+        :param artist_list: List of Artists to be displayed in the listbox.
+        """
+        self.artist_list_box.delete(0, tk.END)
         for item in artist_list:
-            listbox.insert(tk.END, item)
+            self.artist_list_box.insert(tk.END, item)
 
 
     def bookmark_artist(self, event):
-        list_of_artists = event.widget
-
-        selected_index = list_of_artists.nearest(event.y)
-        selected_artist = list_of_artists.get(selected_index)
+        """
+        This function adds an Artist to the bookmarked section of the selection panel.
+        :param event: The event (this finds the selected artist)
+        """
+        selected_index = self.artist_list_box.nearest(event.y)
+        selected_artist = self.artist_list_box.get(selected_index)
 
         if selected_artist in self.bookmarked_artists.get(0, tk.END): # Check artist isn't already bookmarked
             return
@@ -70,13 +91,20 @@ class ArtistSelectorPanel:
 
 
     def remove_artist_from_bookmarks(self, event):
-
+        """
+        This function removes an Artist from the bookmarked section of the selection panel.
+        :param event: The event (this finds the selected artist)
+        """
         selected_index = self.bookmarked_artists.nearest(event.y)
         if selected_index != (): # Ensure an artist has been selected
             self.bookmarked_artists.delete(selected_index, selected_index)
 
 
     def select_artist(self, event):
+        """
+        This function selects an artist for their data to be populated in the data editing panel.
+        :param event: The event ( this finds the selected artist)
+        """
         listbox = event.widget
         selected_index = listbox.nearest(event.y)
         self.selected_artist = listbox.get(selected_index)
