@@ -99,6 +99,29 @@ class Artist:
         }
 
 
+    def delete_album(self, name:str):
+        """
+        Removes an album from the Artists Album list
+        :param name: The name of the Album
+        """
+        for album in self.albums:
+            if album.title.lower() == name.lower():
+                self.albums.remove(album)
+
+
+    def delete(self):
+        """
+        Removes the Artist from the MongoDB database.
+        """
+        with connect_to_database() as db:
+            if self._id is None:
+                return # Artist was never in the database
+
+            db.delete_one({
+                "_id": self._id
+            })
+
+
     def save(self):
         """
         Saves the Artist to the MongoDB database.
@@ -113,6 +136,9 @@ class Artist:
                     "markers": self.markers,
                     "notes": self.notes
                 })
+
+                self._id = db.find_one({"name": self.name})["_id"]
+
             else: # Artist already exists in the database
                 db.replace_one({"_id": self._id},{
                     "name": self.name,

@@ -77,6 +77,40 @@ class TestArtist:
         assert artist.to_dict() == test_artist_data # make_test_artist() uses test_artist_data to construct the Artist
 
 
+    def test_remove_album(self, test_album_data):
+        """
+        This function is supposed to remove an Album from an Artists Album list
+        """
+        artist = make_test_artist()
+        album = make_test_album()
+        artist.add_album(album)
+
+        assert len(artist.albums) == 1 # make sure add albums works
+
+        artist.delete_album(album.title)
+
+        assert len(artist.albums) == 0 # Ensure albums have been removed
+
+
+    def test_delete(self, mocker):
+        """
+        This function is supposed to delete an artist from the MongoDB database
+        """
+        collection = setup_mock_db(mocker, patch_target)
+
+        # Create a fresh new Artist object and save it to the database
+
+        artist = make_test_artist(name="test_name")
+        artist.save() # Save the artist to the database
+
+        # Delete the artist from the database
+        artist.delete()
+
+        database_search_result = collection.find_one({"_id": artist._id})
+
+        assert database_search_result is None
+
+
     def test_save(self, mocker):
         """
         Artist.save() is supposed to save the Artist object to the database in a JSON format.
