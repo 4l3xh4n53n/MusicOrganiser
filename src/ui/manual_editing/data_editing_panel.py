@@ -7,10 +7,6 @@ from src.data.artist_storage import get_artist, add_artist
 from src.data.database import get_artist_list
 
 
-# todo, make it so artists can be created
-# todo, make it so albums can be added
-# todo, all the opposite, delete artists and albums (with "Are you sure" box innit)
-
 class AlbumDataFrame:
     """
     This class has a reproducible frame that displays each piece of album information and allows users to
@@ -18,7 +14,7 @@ class AlbumDataFrame:
     """
 
 
-    def __init__(self, parent_frame, album:Album):
+    def __init__(self, parent_frame, album:Album, selected_artist:Artist, album_frame_list):
         """
         One of these can be made for an Album object, it displays the Albums information and allows it to be
         edited by the user. These will usually be in a list with multiple other Album Frames to make an
@@ -26,6 +22,8 @@ class AlbumDataFrame:
         :param parent_frame: The root object that the list of Albums will be displayed in
         :param album: The Album object which data is going to be displayed and modified
         """
+        self.album_frame_list = album_frame_list
+        self.selected_artist = selected_artist
         self.original_title = album.title # This is used to identify the album later in-case the title changes
 
         # Make variables
@@ -77,21 +75,36 @@ class AlbumDataFrame:
 
         # Make delete button
 
-        delete_button = tk.Button(self.frame, text="Delete")
+        delete_button = tk.Button(self.frame, text="Delete", command=self.delete_album)
         delete_button.pack(side="left")
 
-        # todo, Bind the delete button to Artist.albums.remove()
+
+    def delete_album(self):
+        self.selected_artist.delete_album(self.original_title)
+        self.frame.destroy()
+
+        # Had to write a loop because self.album_frame_list.remove(self.album_frame) did not work
+
+        for album_frame in self.album_frame_list:
+            if album_frame.original_title == self.original_title:
+                self.album_frame_list.remove(album_frame)
 
 
-class NewAlbumFrame: # todo, I don't think this needs to be it's own class
+class NewAlbumFrame:
 
-    def __init__(self, parent_frame):
+    def __init__(self, parent_frame, album_data_parent_frame, album_frames_list:list[AlbumDataFrame],
+                 send_response_message):
         """
         A NewAlbumFrame is an empty frame that allows new Album objects to be added to an Artist and to
         the list of Albums in the DataEditingPanel. It allows the Title, Type, Year, Downloading Status, Markers,
         and Notes to be prefilled.
         :param parent_frame: The root object that the list of Albums will be displayed in
         """
+
+        self.send_response_message = send_response_message
+        self.selected_artist = None
+        self.album_frames_list = album_frames_list
+        self.album_data_parent_frame = album_data_parent_frame
 
         self.frame = tk.Frame(parent_frame)
         self.frame.pack(side="bottom")
@@ -100,7 +113,7 @@ class NewAlbumFrame: # todo, I don't think this needs to be it's own class
         # Make variables
 
         self.title = tk.StringVar()
-        self.type = tk.StringVar()
+        self.type = tk.StringVar(value="studio_album")
         self.year = tk.StringVar()
         self.downloading = tk.BooleanVar()
         self.markers = tk.StringVar()
@@ -124,15 +137,45 @@ class NewAlbumFrame: # todo, I don't think this needs to be it's own class
 
 
     def add_new_album(self):
-        #todo
-        # get the data from the UI
-        # put data into album object
-        # put album object into artist
-        # put new album into album frame
-        pass
+        if self.selected_artist is None:
+            self.send_response_message("You have not selected an artist!")
+            return
+
+        if self.title.get().strip() == "":
+            self.send_response_message("No title selected")
+
+        if not self.year.get().isdigit():
+            self.send_response_message("Date is invalid!")
+            return
+
+        artist_album_list = []
+
+        for album in self.selected_artist.albums:
+            artist_album_list.append(album.title.lower())
+
+        if self.title.get().strip().lower() in artist_album_list:
+            self.send_response_message("Album already exists")
+            return
+
+        new_album = Album(self.title.get().strip(), self.type.get(), int(self.year.get()), self.downloading.get(),
+                          markers=self.markers.get(), notes=self.notes.get())
+
+        self.selected_artist.albums.append(new_album)
+        new_frame = AlbumDataFrame(self.album_data_parent_frame, new_album, self.selected_artist, self.album_frames_list)
+        self.album_frames_list.append(new_frame)
+
+        self.title.set("")
+        self.type.set("")
+        self.year.set("")
+        self.downloading.set(False)
+        self.markers.set("")
+        self.notes.set("")
 
 
 class DataEditingPanel:
+    # todo add a status to show whether changes are saved to database
+    # todo add a button to delete an artist
+    # todo, new artists need to be added to the list of artists
     """
     This class is the right side of the editing screen. Along the top it has the Artist information that
     can be edited. Below the Artist information is the list of Albums belonging to that Artist. These can
@@ -153,24 +196,22 @@ class DataEditingPanel:
 
         # Add new artist
 
-        frame0 = tk.Frame(data_editor)
-        frame0.pack(side="top")
-
+        new_artist_frame = tk.Frame(data_editor)
+        new_artist_frame.pack(side="top")
 
         self.new_artist_name = tk.StringVar(value="")
-        tk.Entry(frame0, textvariable=self.new_artist_name).pack(side="left")
-        tk.Button(frame0, text="Add Artist", command=self.add_new_artist).pack(side="left")
-
+        tk.Entry(new_artist_frame, textvariable=self.new_artist_name).pack(side="left")
+        tk.Button(new_artist_frame, text="Add Artist", command=self.add_new_artist).pack(side="left")
 
         # Save button and response box
 
-        frame1 = tk.Frame(data_editor)
-        frame1.pack(side="top")
+        save_response_frame = tk.Frame(data_editor)
+        save_response_frame.pack(side="top")
 
-        save_button = tk.Button(frame1, text="Write to Database", command=self.update_artist_data)
+        save_button = tk.Button(save_response_frame, text="Write to Database", command=self.update_artist_data)
         save_button.pack(side="left")
 
-        self.response_box = tk.Text(frame1, state="disabled", height=1, width=100)
+        self.response_box = tk.Text(save_response_frame, state="disabled", height=1, width=100)
         self.response_box.pack(side="right", expand=True)
 
         # Artist Variables
@@ -197,7 +238,8 @@ class DataEditingPanel:
 
         tk.Label(self.album_editor, text="Albums: ").pack(side="top", anchor="nw")
 
-        self.new_album_creator = NewAlbumFrame(data_editor)
+        self.new_album_creator = NewAlbumFrame(data_editor, self.album_editor, self.album_frames,
+                                               self.send_response_message)
 
 
     def send_response_message(self, message:str):
@@ -228,7 +270,7 @@ class DataEditingPanel:
 
         # Set the Data for all albums
 
-        for album_frame in self.album_frames: # Get each album displayed in the editing panel
+        for album_frame in  self.album_frames: # Get each album displayed in the editing panel
             album = self.selected_artist.get_album(album_frame.original_title)
 
             album.title = album_frame.title.get().strip()
@@ -253,8 +295,8 @@ class DataEditingPanel:
             new_artist = deepcopy(self.selected_artist)
             new_artist._id = None
 
-            self.selected_artist.save()
-            self.send_response_message("Saved changes.")
+        self.selected_artist.save()
+        self.send_response_message("Saved changes.")
 
             # todo possible ERROR we need to change the "original title" for each AlbumDataFrame
 
@@ -310,8 +352,10 @@ class DataEditingPanel:
         # Create an AlbumFrame for each Album and put it in the editor
 
         for album in self.selected_artist.albums:
-            frame = AlbumDataFrame(self.album_editor, album)
+            frame = AlbumDataFrame(self.album_editor, album, self.selected_artist, self.album_frames)
             self.album_frames.append(frame)
+
+        self.new_album_creator.selected_artist = self.selected_artist
 
         self.send_response_message(f"Selected artist: {self.selected_artist.name}")
 

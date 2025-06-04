@@ -12,8 +12,6 @@ class ArtistSelectorPanel:
     Artist has been selected it calls the set_selected_artist() function from the DataEditingPanel class.
     """
 
-    selected_artist = ""
-
 
     def __init__(self, window:tk.Tk, data_editing_panel: DataEditingPanel):
         """
@@ -107,6 +105,6 @@ class ArtistSelectorPanel:
         """
         listbox = event.widget
         selected_index = listbox.nearest(event.y)
-        self.selected_artist = listbox.get(selected_index)
-        self.data_editing_panel.set_selected_artist(self.selected_artist)
+        selected_artist = listbox.get(selected_index)
+        self.data_editing_panel.set_selected_artist(selected_artist)
 
