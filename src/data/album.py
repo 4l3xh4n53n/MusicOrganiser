@@ -3,8 +3,9 @@ class Album:
     Represents a music album and stores any useful metadata and processing status
     """
 
-    def __init__(self, title: str, album_type: str, date: int, downloading: bool, downloaded: bool, tags: bool,
-                 cover: bool, replay_gain: bool, server_upload: bool, audio_format: str, markers: str, notes: str):
+    def __init__(self, title: str, album_type: str, date: int, downloading: bool = False, downloaded: bool = False,
+                 tags: bool = False, cover: bool = False, replay_gain: bool = False, server_upload: bool = False,
+                 audio_format: str = False, markers: str = "", notes: str = ""):
         """
         Initialises a new Album instance
 
