@@ -33,6 +33,6 @@ class TestArtistStorage:
         of artists.
         """
         test_artist = make_test_artist()
-        artist_storage.add_artist(test_artist)
+        artist_storage.cache_artist(test_artist)
 
         assert test_artist in artist_storage.artists

@@ -3,8 +3,8 @@ from copy import deepcopy
 
 from src.data.album import Album
 from src.data.artist import Artist
-from src.data.artist_storage import get_artist, add_artist
-from src.data.database import get_artist_list
+from src.data.artist_storage import get_artist, cache_artist, un_cache_artist
+from src.data.database import get_artist_list, remove_from_artist_list, add_to_artist_list
 
 
 class AlbumDataFrame:
@@ -168,19 +168,17 @@ class NewAlbumFrame:
         self.type.set("")
         self.year.set("")
         self.downloading.set(False)
-        self.markers.set("")
+        self.markers.set("") # FIXME bro fire!
         self.notes.set("")
 
 
 class DataEditingPanel:
-    # todo add a status to show whether changes are saved to database
-    # todo add a button to delete an artist
-    # todo, new artists need to be added to the list of artists
     """
     This class is the right side of the editing screen. Along the top it has the Artist information that
     can be edited. Below the Artist information is the list of Albums belonging to that Artist. These can
     also be modified.
     """
+    # todo add a status to show whether changes are saved to database
 
 
     def __init__(self, window:tk.Tk):
@@ -230,6 +228,7 @@ class DataEditingPanel:
         tk.Entry(artist_information, width=30, textvariable=self.name).pack(side="left")
         tk.Entry(artist_information, width=4, textvariable=self.markers).pack(side="left")
         tk.Entry(artist_information, width=50, textvariable=self.notes).pack(side="left")
+        tk.Button(artist_information, text="Delete Artist", command=self.delete_artist).pack(side="left")
 
         # Album Editor
 
@@ -298,24 +297,34 @@ class DataEditingPanel:
         self.selected_artist.save()
         self.send_response_message("Saved changes.")
 
-            # todo possible ERROR we need to change the "original title" for each AlbumDataFrame
+        # todo possible ERROR we need to change the "original title" for each AlbumDataFrame
+
+
+    def delete_artist(self):
+        un_cache_artist(self.selected_artist)
+        remove_from_artist_list(self.selected_artist.name)
+        self.selected_artist.delete() # todo, make a way to reload the artist list when artists are added and deleted
+
+        self.send_response_message("Deleted artist")
 
 
     def add_new_artist(self):
         # Make sure an Artist with the same name does not already exist
 
         existing_artists = map(str.lower, get_artist_list())
-        new_artist_name = self.new_artist_name.get()
+        new_artist_name = self.new_artist_name.get().strip() # todo, could some of the .strip() stuff be run in the artist constructor?
 
         if new_artist_name.lower() in existing_artists:
             self.send_response_message("Artist already exists")
             return
 
         # Make the Artist object and add them to the local cache
-        new_artist = Artist(self.new_artist_name.get())
-        add_artist(new_artist)
+        new_artist = Artist(new_artist_name) # todo, could these be in their own function? Could this decouple more logic from the UI
+        cache_artist(new_artist)
+        add_to_artist_list(new_artist_name)
 
-        self.set_selected_artist(self.new_artist_name.get())
+        self.set_selected_artist(new_artist_name)
+        self.send_response_message("New artist has been created")
 
 
     def set_selected_artist(self, selected_artist_name:str):

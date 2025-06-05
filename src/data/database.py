@@ -9,6 +9,8 @@ artist_list: list[str] = None
 The purpose of the artist_list is to have a list of artists that can be selected 
 from a menu that can then be used for manipulating the artist and associated albums
 """
+# todo, we could just load the artist_list from the database at the start of the program, rather than check everytime
+# todo, would this be more appropriate to be loaded into artist_storage?
 
 
 @contextmanager
@@ -37,6 +39,9 @@ def filter_artist_list(search_term:str):
     return [
         name for name in artist_list if search_term.lower() in name.lower()
     ]
+    # todo, could this function be better?
+    # todo, change unicodes, remove spaces
+    # todo, also consider making it inclusive and exclusive
 
 
 def get_artist_list():
@@ -51,6 +56,26 @@ def get_artist_list():
             artist_list = db.distinct("name")
 
     return artist_list
+
+
+def add_to_artist_list(artist_name:str):
+    """
+    This function adds an artists name to the list of artists which can be used for searching
+    and selecting artists for editing.
+    This function does not check for duplicates
+    :param artist_name: The name of the new artist
+    """
+    global artist_list
+    artist_list.append(artist_name)
+
+
+def remove_from_artist_list(artist_name:str):
+    """
+    This function removes an artists name from the list of artists.
+    :param artist_name: The name of the artist
+    """
+    global artist_list
+    artist_list.remove(artist_name)
 
 
 def get_artists_matching_criteria(markers:str):

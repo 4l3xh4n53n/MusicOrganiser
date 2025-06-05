@@ -25,8 +25,17 @@ def get_artist(artist_name:str):
     return artist
 
 
-def add_artist(artist:Artist):
+def cache_artist(artist:Artist):
     """
     This function adds an artist object to the local artist cache
+    :param artist: The artist to be added to cache
     """
     artists.append(artist)
+
+
+def un_cache_artist(artist:Artist):
+    """
+    This function removes an artist object from the local artist cache
+    :param artist: The artist to be removed from cache
+    """
+    artists.remove(artist)
