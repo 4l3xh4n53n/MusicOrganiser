@@ -1,0 +1,85 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0" version="27.1.4">
+  <diagram name="Page-1" id="BzRGxFRoIF7dtPHbyMH1">
+    <mxGraphModel dx="2170" dy="732" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-37" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#BBBBBB;" vertex="1" parent="1">
+          <mxGeometry x="-90" y="60" width="1570" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-31" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#666666;strokeColor=none;endWidth=34.910762574364526;endSize=11.955813953488372;width=24.88372093023256;gradientColor=#E0E0E0;gradientDirection=west;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-80" y="110" as="sourcePoint" />
+            <mxPoint x="1467.5" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-3" value="&lt;div&gt;- Add&amp;nbsp;&lt;br&gt;- Remove&amp;nbsp;&lt;br&gt;- Edit&amp;nbsp;&lt;br&gt;albums and artists.&lt;br&gt;&lt;br&gt;Better UI layout&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB1B1;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="120" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-6" value="Comprehensive automated test suite for pre-existing codebase" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#AAFFAD;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="230" y="80" width="120" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-8" value="Criteria based Artist and Album filter/search" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB1B1;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="380" y="80" width="120" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-10" value="- Automated folder structure&lt;br&gt;- Automated cue split" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB5FC;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="530" y="80" width="120" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-12" value="- Automated tagging" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB5FC;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="680" y="80" width="120" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-14" value="- Cover Selector" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB5FC;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="830" y="80" width="120" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-16" value="- Replay Gain&lt;br&gt;- Re-encode" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB1B1;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="980" y="80" width="120" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-18" value="Make the program less bespoke and more customisable out of the box" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB1B1;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="80" width="120" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-20" value="- Make a web based version with an API?&amp;nbsp;&lt;br&gt;- What about a command line version?" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB5FC;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="80" width="120" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-22" value="1.0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#FFB1B1;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="90" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-23" value="2.0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#FFB1B1;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="390" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-24" value="&lt;div&gt;3.0&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#FFB1B1;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="990" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-25" value="4.0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#FFB1B1;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-26" value="im.considering.it" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#FFB5FC;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-27" value="3.0.alpha.3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#FFB5FC;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="840" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-28" value="3.0.alpha.2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#FFB5FC;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="690" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-29" value="3.0.alpha.1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#FFB5FC;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="540" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-30" value="&lt;div&gt;1.1&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#AAFFAD;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="240" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-35" value="Foundation of a program&lt;br&gt;&lt;div&gt;Can:&lt;/div&gt;&lt;div&gt;Add, edit and remove albums and artists but code is unrefined.&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB5FC;glass=0;shadow=0;gradientColor=#FFFFFF;align=left;strokeColor=none;verticalAlign=top;spacingTop=24;spacingLeft=4;" vertex="1" parent="1">
+          <mxGeometry x="-60" y="80" width="120" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-36" value="1.0.alpha.1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#FFB5FC;arcSize=50;shadow=0;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="-50" y="70" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PwK9XfzBWlm3G84g5zDN-34" value="We are here" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#FF6666;fontSize=12;fontStyle=1;fontColor=#FF6666;verticalAlign=middle;labelPosition=right;verticalLabelPosition=middle;align=left;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint y="330" as="sourcePoint" />
+            <mxPoint y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
