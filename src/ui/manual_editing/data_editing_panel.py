@@ -59,7 +59,7 @@ class AlbumDataFrame:
 
         # Boolean values
 
-        album_downloading = tk.Checkbutton(self.frame, text="Downloading", height=1, width=10, variable=self.downloading)
+        album_downloading = tk.Checkbutton(self.frame, text="Downloading", bg="red", activebackground="green", height=1, width=10, variable=self.downloading)
         album_downloaded = tk.Checkbutton(self.frame, text="Downloaded", height=1, width=10, variable=self.downloaded)
         album_tags = tk.Checkbutton(self.frame, text="Tags", height=1, width=4, variable=self.tags)
         album_cover = tk.Checkbutton(self.frame, text="Cover", height=1, width=5, variable=self.cover)
@@ -78,8 +78,46 @@ class AlbumDataFrame:
         delete_button = tk.Button(self.frame, text="Delete", command=self.delete_album)
         delete_button.pack(side="left")
 
+        # Set the background of each button to change
+
+        for check_value, check_box in [(self.downloading,album_downloading),
+                                       (self.downloaded, album_downloaded),
+                                       (self.tags, album_tags),
+                                       (self.cover, album_cover),
+                                       (self.replay_gain, album_replay_gain),
+                                       (self.server_upload, album_server_upload)]:
+            check_value.trace_add('write', self.change_checkbox_colour(check_value, check_box))
+
+            # Update the colours of values are loaded
+
+            if check_value.get():
+                check_box.config(bg="green", activebackground="red")
+            else:
+                check_box.config(bg="red", activebackground="green")
+
+
+    def change_checkbox_colour(self, value: tk.BooleanVar, button: tk.Checkbutton):
+        """
+        This function returns a function so the checkboxes can have their colours turned from red to green
+        depending on their values
+        :param value: The Variable the checkbox is attached to
+        :param button: The actual checkbox
+        :return: Function to change colour
+        """
+        def change_colour(*_):
+            if value.get():
+                button.config(bg="green", activebackground="green")
+            else:
+                button.config(bg="red", activebackground="red")
+
+        return change_colour
+
 
     def delete_album(self):
+        """
+        This function deletes the album from the selected Artists album list and removes the frame from
+        the album screen
+        """
         self.selected_artist.delete_album(self.original_title)
         self.frame.destroy()
 
@@ -137,6 +175,11 @@ class NewAlbumFrame:
 
 
     def add_new_album(self):
+        """
+        This function adds a new album using data filled out in the Entry boxes.
+        This function creates the Album object, makes a new AlbumDataFrame and adds the Album to the Artist
+        """
+
         if self.selected_artist is None:
             self.send_response_message("You have not selected an artist!")
             return
@@ -165,10 +208,9 @@ class NewAlbumFrame:
         self.album_frames_list.append(new_frame)
 
         self.title.set("")
-        self.type.set("")
         self.year.set("")
         self.downloading.set(False)
-        self.markers.set("") # FIXME bro fire!
+        self.markers.set("")
         self.notes.set("")
 
 
