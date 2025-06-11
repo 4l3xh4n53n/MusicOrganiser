@@ -3,8 +3,7 @@ from copy import deepcopy
 
 from src.data.album import Album
 from src.data.artist import Artist
-from src.data.artist_storage import get_artist, cache_artist, un_cache_artist
-from src.data.database import get_artist_list, remove_from_artist_list, add_to_artist_list
+from src.data.artist_storage import ArtistStorage
 
 
 class AlbumDataFrame:
@@ -22,6 +21,13 @@ class AlbumDataFrame:
         :param parent_frame: The root object that the list of Albums will be displayed in
         :param album: The Album object which data is going to be displayed and modified
         """
+
+        # todo, RE_WRITE INNIT
+
+        # Get all variables belonging to an Album object
+
+        vars(album) # todo, I think this needs to be filtered
+
         self.album_frame_list = album_frame_list
         self.selected_artist = selected_artist
         self.original_title = album.title # This is used to identify the album later in-case the title changes
@@ -95,8 +101,8 @@ class AlbumDataFrame:
             else:
                 check_box.config(bg="red", activebackground="green")
 
-
-    def change_checkbox_colour(self, value: tk.BooleanVar, button: tk.Checkbutton):
+    @staticmethod
+    def change_checkbox_colour(value: tk.BooleanVar, button: tk.Checkbutton):
         """
         This function returns a function so the checkboxes can have their colours turned from red to green
         depending on their values
@@ -223,12 +229,14 @@ class DataEditingPanel:
     # todo add a status to show whether changes are saved to database
 
 
-    def __init__(self, window:tk.Tk):
+    def __init__(self, window:tk.Tk, artist_storage:ArtistStorage):
         """
         This function creates the DataEditingPanel, that is displayed on the right-hand side of the manual
         editing screen. This does not take an Artist value as the Artist is updated later.
         :param window: The editing screen
         """
+        self.artist_storage = artist_storage
+
         self.selected_artist = None
         self.album_frames = []
         data_editor = tk.Frame(window)
@@ -343,9 +351,10 @@ class DataEditingPanel:
 
 
     def delete_artist(self):
-        un_cache_artist(self.selected_artist)
-        remove_from_artist_list(self.selected_artist.name)
-        self.selected_artist.delete() # todo, make a way to reload the artist list when artists are added and deleted
+        self.artist_storage.delete_artist(self.selected_artist)
+
+        # todo, clear out artist data
+        # todo, reload the artist_list
 
         self.send_response_message("Deleted artist")
 
@@ -353,17 +362,14 @@ class DataEditingPanel:
     def add_new_artist(self):
         # Make sure an Artist with the same name does not already exist
 
-        existing_artists = map(str.lower, get_artist_list())
+        existing_artists = [name.lower() for name in self.artist_storage.get_selectable_artists()]
         new_artist_name = self.new_artist_name.get().strip() # todo, could some of the .strip() stuff be run in the artist constructor?
 
         if new_artist_name.lower() in existing_artists:
             self.send_response_message("Artist already exists")
             return
 
-        # Make the Artist object and add them to the local cache
-        new_artist = Artist(new_artist_name) # todo, could these be in their own function? Could this decouple more logic from the UI
-        cache_artist(new_artist)
-        add_to_artist_list(new_artist_name)
+        self.artist_storage.create_artist(new_artist_name)
 
         self.set_selected_artist(new_artist_name)
         self.send_response_message("New artist has been created")
@@ -390,7 +396,7 @@ class DataEditingPanel:
         self.album_frames.clear()
 
         # Get the artist
-        self.selected_artist = get_artist(selected_artist_name)
+        self.selected_artist = self.artist_storage.get_artist(selected_artist_name)
 
         # Set the Entry box variables to artist data
 

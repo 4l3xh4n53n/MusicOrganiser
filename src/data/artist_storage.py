@@ -31,21 +31,20 @@ class ArtistStorage:
         self.artist_cache.append(artist)
         return artist
 
-
-    def cache_artist(self, artist:Artist):
+    def create_artist(self, artist_name = None, artist_albums = None, artist_markers = None, artist_notes = None):
         """
-        This function adds an artist object to the local artist cache
-        :param artist: The artist to be added to cache
+        This function creates a new Artist object and adds them to the cache and list of selectable artists.
+        All variables must be error checked and sanitised before being passed to the function
+        :param artist_name: The name of the Artist
+        :param artist_albums: The Artists albums
+        :param artist_markers: The Artists markers
+        :param artist_notes: The Artists notes
+        :return: Newly created Artist object
         """
+        artist = Artist(name=artist_name, albums=artist_albums, markers=artist_markers, notes=artist_notes)
         self.artist_cache.append(artist)
-
-
-    def un_cache_artist(self, artist:Artist):
-        """
-        This function removes an artist object from the local artist cache
-        :param artist: The artist to be removed from cache
-        """
-        self.artist_cache.remove(artist)
+        self.selectable_artists.append(artist_name)
+        return artist
 
 
     def get_selectable_artists(self, search_term:str = None):
@@ -71,6 +70,7 @@ class ArtistStorage:
         This includes the list of artists, the database, and the list of selectable artists
         :param artist: The Artist to be deleted
         """
+        self.artist_cache.remove(artist)
         artist.delete()
         self.selectable_artists.remove(artist.name)
 

@@ -1,6 +1,5 @@
 from contextlib import contextmanager
 from typing import Collection, Optional
-from warnings import deprecated
 
 import pymongo.errors
 from pymongo import MongoClient
@@ -28,19 +27,6 @@ def connect_to_database() -> Collection:
         client.close()
 
 
-@deprecated
-def filter_artist_list(search_term:str):
-    """
-    This can filter the list of artists gotten from get_artist_list
-    :param search_term: filter
-    :return: Filtered list of artists
-    """
-    global artist_list
-    return [
-        name for name in artist_list if search_term.lower() in name.lower()
-    ]
-
-
 def get_artist_list():
     """
     Gets the list of all current artists in the database
@@ -53,28 +39,6 @@ def get_artist_list():
             artist_list = db.distinct("name")
 
     return artist_list
-
-
-@deprecated
-def add_to_artist_list(artist_name:str):
-    """
-    This function adds an artists name to the list of artists which can be used for searching
-    and selecting artists for editing.
-    This function does not check for duplicates
-    :param artist_name: The name of the new artist
-    """
-    global artist_list
-    artist_list.append(artist_name)
-
-
-@deprecated
-def remove_from_artist_list(artist_name:str):
-    """
-    This function removes an artists name from the list of artists.
-    :param artist_name: The name of the artist
-    """
-    global artist_list
-    artist_list.remove(artist_name)
 
 
 def get_artists_matching_criteria(markers:str):

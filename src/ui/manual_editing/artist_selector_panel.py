@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import SINGLE
 
-from src.data.database import filter_artist_list, get_artist_list
+from src.data.artist_storage import ArtistStorage
 from src.ui.manual_editing.data_editing_panel import DataEditingPanel
 
 
@@ -13,13 +13,14 @@ class ArtistSelectorPanel:
     """
 
 
-    def __init__(self, window:tk.Tk, data_editing_panel: DataEditingPanel):
+    def __init__(self, window:tk.Tk, data_editing_panel: DataEditingPanel, artist_storage : ArtistStorage):
         """
         This function creates the ArtistSelectorPanel that is displayed on the left-hand side of the manual
         editing screen. It allows an Artist to be selected and bookmarked.
         :param window: The root window that the artist selector will go in
         :param data_editing_panel: The DataEditingPanel that it will update when an Artist is chosen
         """
+        self.artist_storage = artist_storage
         self.data_editing_panel = data_editing_panel
 
         # Make a frame to contain the selection panel elements
@@ -51,7 +52,7 @@ class ArtistSelectorPanel:
         self.artist_list_box.pack()
         self.bookmarked_artists.pack()
 
-        self.set_artist_list_box_contents(get_artist_list())
+        self.set_artist_list_box_contents(self.artist_storage.get_selectable_artists())
 
 
     def filter_artist_list(self, event):
@@ -60,7 +61,7 @@ class ArtistSelectorPanel:
         :param event: Enter button event
         """
         search_query = event.widget.get()
-        artist_list = filter_artist_list(search_query)
+        artist_list = self.artist_storage.get_selectable_artists(search_query)
         self.set_artist_list_box_contents(artist_list)
 
 
