@@ -38,7 +38,14 @@ class Artist:
             if data is None:
                 return None
 
-        return cls(name, data.get("albums"), data.get("notes"), data.get("markers"), data.get("_id"))
+        albums = []
+
+        for album_data in data.get("albums"):
+            albums.append(
+                Album.from_dict(album_data)
+            )
+
+        return cls(name, albums, data.get("notes"), data.get("markers"), data.get("_id"))
 
 
     def get_album(self, name:str):
