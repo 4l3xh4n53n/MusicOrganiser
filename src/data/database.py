@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from typing import Collection, Optional
+from warnings import deprecated
 
 import pymongo.errors
 from pymongo import MongoClient
@@ -9,9 +10,7 @@ artist_list: list[str] = None
 The purpose of the artist_list is to have a list of artists that can be selected 
 from a menu that can then be used for manipulating the artist and associated albums
 """
-# todo, we could just load the artist_list from the database at the start of the program, rather than check everytime
-# todo, would this be more appropriate to be loaded into artist_storage?
-
+# todo apparently having all this in not a class is an anti-pattern
 
 @contextmanager
 def connect_to_database() -> Collection:
@@ -29,6 +28,7 @@ def connect_to_database() -> Collection:
         client.close()
 
 
+@deprecated
 def filter_artist_list(search_term:str):
     """
     This can filter the list of artists gotten from get_artist_list
@@ -39,9 +39,6 @@ def filter_artist_list(search_term:str):
     return [
         name for name in artist_list if search_term.lower() in name.lower()
     ]
-    # todo, could this function be better?
-    # todo, change unicodes, remove spaces
-    # todo, also consider making it inclusive and exclusive
 
 
 def get_artist_list():
@@ -58,6 +55,7 @@ def get_artist_list():
     return artist_list
 
 
+@deprecated
 def add_to_artist_list(artist_name:str):
     """
     This function adds an artists name to the list of artists which can be used for searching
@@ -69,6 +67,7 @@ def add_to_artist_list(artist_name:str):
     artist_list.append(artist_name)
 
 
+@deprecated
 def remove_from_artist_list(artist_name:str):
     """
     This function removes an artists name from the list of artists.
