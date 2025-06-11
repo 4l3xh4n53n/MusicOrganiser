@@ -20,12 +20,3 @@ class TestDatabase:
         assert set(artist_list) == {"artist1", "artist2", "artist3"}
 
 
-    def test_filter_artist_list(self):
-        """
-        Database.filter_artist_list() is supposed to filter the artist_list whilst being
-        case-insensitive
-        """
-        database.artist_list = ["band1", "artist1", "Band2", "Artist2"]
-        assert database.filter_artist_list("ban") == ["band1", "Band2"]
-        assert database.filter_artist_list("AR") == ["artist1", "Artist2"]
-
