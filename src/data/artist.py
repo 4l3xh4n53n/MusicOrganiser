@@ -6,7 +6,7 @@ class Artist:
     """
     Represents an artist contains a list of albums and some useful metadata
     """
-    albums = []
+
 
     def __init__(self, name:str, albums:list[Album] = None, notes:str = None, markers:str = None, _id = None):
         """
@@ -20,12 +20,11 @@ class Artist:
         self.name = name
         self.notes = notes
         self.markers = markers
-        self.albums = []
         self._id = _id
         if albums is not None:
-            for album in albums:
-                self.albums.append(Album.from_dict(album))
-
+            self.albums = albums
+        else:
+            self.albums = []
 
     @classmethod
     def from_database(cls, name):
