@@ -22,84 +22,62 @@ class AlbumDataFrame:
         :param album: The Album object which data is going to be displayed and modified
         """
 
-        # todo, RE_WRITE INNIT
-
-        # Get all variables belonging to an Album object
-
-        vars(album) # todo, I think this needs to be filtered
-
-        self.album_frame_list = album_frame_list
+        self.original_title = album.title
         self.selected_artist = selected_artist
-        self.original_title = album.title # This is used to identify the album later in-case the title changes
-
-        # Make variables
-
-        self.title = tk.StringVar(value=album.title)
-        self.type = tk.StringVar(value=album.type)
-        self.year = tk.StringVar(value=str(album.date))
-
-        self.downloading = tk.BooleanVar(value=album.downloading)
-        self.downloaded = tk.BooleanVar(value=album.downloaded)
-        self.tags = tk.BooleanVar(value=album.tags)
-        self.cover = tk.BooleanVar(value=album.cover)
-        self.replay_gain = tk.BooleanVar(value=album.replay_gain)
-        self.server_upload = tk.BooleanVar(value=album.server_upload)
-
-        self.format = tk.StringVar(value=album.format)
-        self.markers = tk.StringVar(value=album.markers if album.markers is not None else "")
-        self.notes = tk.StringVar(value=album.notes if album.notes is not None else "")
+        self.album_frame_list = album_frame_list
 
         # Make a frame for the album
 
         self.frame = tk.Frame(parent_frame)
         self.frame.pack()
 
-        # String values
+        boxes = [
+            ('title', tk.Entry, 30, album.title),
+            ('type', tk.OptionMenu, ["studio_album", "ep", "compilations", "covers", "singles"], album.type),
+            ('date', tk.Entry, 6, str(album.date)),
 
-        album_title = tk.Entry(self.frame, width=30, textvariable=self.title)
-        album_type = tk.OptionMenu(self.frame, self.type, *["studio_album", "ep", "compilations", "covers", "singles"])
-        album_year = tk.Entry(self.frame, width=6, textvariable=self.year)
-        album_format = tk.Entry(self.frame, width=8, textvariable=self.format)
-        album_markers = tk.Entry(self.frame, width=6, textvariable=self.markers)
-        album_notes = tk.Entry(self.frame, width=40, textvariable=self.notes)
+            ('downloading', tk.Checkbutton, "Downloading", album.downloading),
+            ('downloaded', tk.Checkbutton, "Downloaded", album.downloaded),
+            ('tags', tk.Checkbutton, "Tags", album.tags),
+            ('cover', tk.Checkbutton, "Cover", album.cover),
+            ('replay_gain', tk.Checkbutton, "Replay Gain", album.replay_gain),
+            ('server_upload', tk.Checkbutton, "Server Upload", album.server_upload),
 
-        # Boolean values
+            ('format', tk.Entry, 8, album.format),
+            ('markers', tk.Entry, 6, album.markers if album.markers is not None else ""),
+            ('notes', tk.Entry, 40, album.notes if album.notes is not None else "")
+        ]
 
-        album_downloading = tk.Checkbutton(self.frame, text="Downloading", bg="red", activebackground="green", height=1, width=10, variable=self.downloading)
-        album_downloaded = tk.Checkbutton(self.frame, text="Downloaded", height=1, width=10, variable=self.downloaded)
-        album_tags = tk.Checkbutton(self.frame, text="Tags", height=1, width=4, variable=self.tags)
-        album_cover = tk.Checkbutton(self.frame, text="Cover", height=1, width=5, variable=self.cover)
-        album_replay_gain = tk.Checkbutton(self.frame, text="Replay Gain", height=1, width=9, variable=self.replay_gain)
-        album_server_upload = tk.Checkbutton(self.frame, text="Server Upload", height=1, width=12, variable=self.server_upload)
+        for variable_name, box_type, special, variable in boxes:
+            new_box = None
 
-        # Pack all elements
+            if box_type is tk.Entry:
+                new_variable = tk.StringVar(value=variable)
+                setattr(self, variable_name, new_variable)
+                new_box = tk.Entry(self.frame, width=special, textvariable=new_variable)
 
-        for element in [album_title, album_type, album_year, album_downloading,
-                        album_downloaded, album_tags, album_cover, album_replay_gain,
-                        album_server_upload, album_format, album_markers, album_notes]:
-            element.pack(side="left")
+            if box_type is tk.OptionMenu:
+                new_variable = tk.StringVar(value=variable)
+                setattr(self, variable_name, new_variable)
+                new_box = tk.OptionMenu(self.frame, new_variable, *special)
+
+            if box_type is tk.Checkbutton:
+                new_variable = tk.BooleanVar(value=variable)
+                setattr(self, variable_name, new_variable)
+                new_box = tk.Checkbutton(self.frame, text=special, height=1, variable=new_variable)
+                new_variable.trace_add('write', self.change_checkbox_colour(new_variable, new_box))
+                if variable is True:
+                    new_box.config(bg="green", activebackground="red")
+                else:
+                    new_box.config(bg="red", activebackground="green")
+
+            new_box.pack(side="left")
 
         # Make delete button
 
         delete_button = tk.Button(self.frame, text="Delete", command=self.delete_album)
         delete_button.pack(side="left")
 
-        # Set the background of each button to change
-
-        for check_value, check_box in [(self.downloading,album_downloading),
-                                       (self.downloaded, album_downloaded),
-                                       (self.tags, album_tags),
-                                       (self.cover, album_cover),
-                                       (self.replay_gain, album_replay_gain),
-                                       (self.server_upload, album_server_upload)]:
-            check_value.trace_add('write', self.change_checkbox_colour(check_value, check_box))
-
-            # Update the colours of values are loaded
-
-            if check_value.get():
-                check_box.config(bg="green", activebackground="red")
-            else:
-                check_box.config(bg="red", activebackground="green")
 
     @staticmethod
     def change_checkbox_colour(value: tk.BooleanVar, button: tk.Checkbutton):
@@ -324,8 +302,8 @@ class DataEditingPanel:
 
             album.title = album_frame.title.get().strip()
             album.type = album_frame.type.get().strip()
-            if album_frame.year.get().isdigit():
-                album.date = int(album_frame.year.get())
+            if album_frame.date.get().isdigit():
+                album.date = int(album_frame.date.get())
             else:
                 self.send_response_message("Date format is not valid")
                 return
