@@ -118,7 +118,7 @@ class NewAlbumFrame:
                  send_response_message):
         """
         A NewAlbumFrame is an empty frame that allows new Album objects to be added to an Artist and to
-        the list of Albums in the DataEditingPanel. It allows the Title, Type, Year, Downloading Status, Markers,
+        the list of Albums in the DataEditingPanel. It allows the Title, Type, Date, Downloading Status, Markers,
         and Notes to be prefilled.
         :param parent_frame: The root object that the list of Albums will be displayed in
         """
@@ -136,7 +136,7 @@ class NewAlbumFrame:
 
         self.title = tk.StringVar()
         self.type = tk.StringVar(value="studio_album")
-        self.year = tk.StringVar()
+        self.date = tk.StringVar()
         self.downloading = tk.BooleanVar()
         self.markers = tk.StringVar()
         self.notes = tk.StringVar()
@@ -145,7 +145,7 @@ class NewAlbumFrame:
 
         album_title = tk.Entry(self.frame, width=30, textvariable=self.title)
         album_type = tk.OptionMenu(self.frame, self.type, *["studio_album", "ep", "compilations", "covers", "singles"])
-        album_year = tk.Entry(self.frame, width=10, textvariable=self.year)
+        album_date = tk.Entry(self.frame, width=10, textvariable=self.date)
         album_downloading = tk.Checkbutton(self.frame, text="Downloading", height=1, width=10, variable=self.downloading)
         album_markers = tk.Entry(self.frame, width=10, textvariable=self.markers)
         album_notes = tk.Entry(self.frame, width=40, textvariable=self.notes)
@@ -154,7 +154,7 @@ class NewAlbumFrame:
 
         save_button = tk.Button(self.frame, text="Save", command=self.add_new_album)
 
-        for element in [album_title, album_type, album_year, album_downloading, album_markers, album_notes, save_button]:
+        for element in [album_title, album_type, album_date, album_downloading, album_markers, album_notes, save_button]:
             element.pack(side="left")
 
 
@@ -171,7 +171,7 @@ class NewAlbumFrame:
         if self.title.get().strip() == "":
             self.send_response_message("No title selected")
 
-        if not self.year.get().isdigit():
+        if not self.date.get().isdigit():
             self.send_response_message("Date is invalid!")
             return
 
@@ -184,7 +184,7 @@ class NewAlbumFrame:
             self.send_response_message("Album already exists")
             return
 
-        new_album = Album(self.title.get().strip(), self.type.get(), int(self.year.get()), self.downloading.get(),
+        new_album = Album(self.title.get().strip(), self.type.get(), int(self.date.get()), self.downloading.get(),
                           markers=self.markers.get(), notes=self.notes.get())
 
         self.selected_artist.albums.append(new_album)
@@ -192,7 +192,7 @@ class NewAlbumFrame:
         self.album_frames_list.append(new_frame)
 
         self.title.set("")
-        self.year.set("")
+        self.date.set("")
         self.downloading.set(False)
         self.markers.set("")
         self.notes.set("")
