@@ -6,6 +6,76 @@ from src.data.artist import Artist
 from src.data.artist_storage import ArtistStorage
 
 
+class DataFrame:
+    """
+    This class stores data relating to new or existing albums. It can be used from NewAlbumFrame or an AlbumDataFrame
+    """
+
+    def __init__(self, parent_frame, boxes):
+        """
+        This function takes a list of tuples each containing 4 items, their order depending on the type of variable.
+        The format for boxes is simple.
+
+        - Variable Name - This is quite simply the name of the variable in the class
+        - Box Type - This is the type of input box that is used in the tkinter UI
+        - Special - This one depends on the input box type:
+            - Entries - This defines how wide the Entry box will be
+            - OptionMenus - This defines the selectable options
+            - Checkbuttons - This defines the label for the Checkbutton
+        - Variable - This is the variable that the box will be linked to
+
+        :param parent_frame: This is the frame that the DataFrame is being packed into
+        :param boxes: This is where the variables for each frame are stored
+        """
+
+        for variable_name, box_type, special, variable in boxes:
+            new_box = None
+
+            if box_type is tk.Entry:
+                new_variable = tk.StringVar(value=variable)
+                setattr(self, variable_name, new_variable)
+                new_box = tk.Entry(parent_frame, width=special, textvariable=new_variable)
+
+            if box_type is tk.OptionMenu:
+                new_variable = tk.StringVar(value=variable)
+                setattr(self, variable_name, new_variable)
+                new_box = tk.OptionMenu(parent_frame, new_variable, *special)
+
+            if box_type is tk.Checkbutton:
+                new_variable = tk.BooleanVar(value=variable)
+                setattr(self, variable_name, new_variable)
+                new_box = tk.Checkbutton(parent_frame, text=special, height=1, variable=new_variable)
+
+                # Make the checkbox colour changed based on whether its value is True or False
+
+                new_variable.trace_add('write', self.change_checkbox_colour(new_variable, new_box))
+                if variable is True:
+                    new_box.config(bg="green", activebackground="red")
+                else:
+                    new_box.config(bg="red", activebackground="green")
+
+            new_box.pack(side="left")
+
+
+    @staticmethod
+    def change_checkbox_colour(value: tk.BooleanVar, button: tk.Checkbutton):
+        """
+        This function returns a function so the checkboxes can have their colours turned from red to green
+        depending on their values
+        :param value: The Variable the checkbox is attached to
+        :param button: The actual checkbox
+        :return: Function to change colour
+        """
+
+        def change_colour(*_):
+            if value.get():
+                button.config(bg="green", activebackground="green")
+            else:
+                button.config(bg="red", activebackground="red")
+
+        return change_colour
+
+
 class AlbumDataFrame:
     """
     This class has a reproducible frame that displays each piece of album information and allows users to
@@ -48,53 +118,12 @@ class AlbumDataFrame:
             ('notes', tk.Entry, 40, album.notes if album.notes is not None else "")
         ]
 
-        for variable_name, box_type, special, variable in boxes:
-            new_box = None
-
-            if box_type is tk.Entry:
-                new_variable = tk.StringVar(value=variable)
-                setattr(self, variable_name, new_variable)
-                new_box = tk.Entry(self.frame, width=special, textvariable=new_variable)
-
-            if box_type is tk.OptionMenu:
-                new_variable = tk.StringVar(value=variable)
-                setattr(self, variable_name, new_variable)
-                new_box = tk.OptionMenu(self.frame, new_variable, *special)
-
-            if box_type is tk.Checkbutton:
-                new_variable = tk.BooleanVar(value=variable)
-                setattr(self, variable_name, new_variable)
-                new_box = tk.Checkbutton(self.frame, text=special, height=1, variable=new_variable)
-                new_variable.trace_add('write', self.change_checkbox_colour(new_variable, new_box))
-                if variable is True:
-                    new_box.config(bg="green", activebackground="red")
-                else:
-                    new_box.config(bg="red", activebackground="green")
-
-            new_box.pack(side="left")
+        self.data = DataFrame(self.frame, boxes)
 
         # Make delete button
 
         delete_button = tk.Button(self.frame, text="Delete", command=self.delete_album)
         delete_button.pack(side="left")
-
-
-    @staticmethod
-    def change_checkbox_colour(value: tk.BooleanVar, button: tk.Checkbutton):
-        """
-        This function returns a function so the checkboxes can have their colours turned from red to green
-        depending on their values
-        :param value: The Variable the checkbox is attached to
-        :param button: The actual checkbox
-        :return: Function to change colour
-        """
-        def change_colour(*_):
-            if value.get():
-                button.config(bg="green", activebackground="green")
-            else:
-                button.config(bg="red", activebackground="red")
-
-        return change_colour
 
 
     def delete_album(self):
@@ -132,30 +161,20 @@ class NewAlbumFrame:
         self.frame.pack(side="bottom")
         tk.Label(self.frame, text="Add New Album:").pack(side="left")
 
-        # Make variables
+        boxes = [
+            ('title', tk.Entry, 30, ""),
+            ('type', tk.OptionMenu, ["studio_album", "ep", "compilations", "covers", "singles"], "studio_album"),
+            ('date', tk.Entry, 6, ""),
+            ('downloading', tk.Checkbutton, "Downloading", False),
+            ('markers', tk.Entry, 6, ""),
+            ('notes', tk.Entry, 40, "")
+        ]
 
-        self.title = tk.StringVar()
-        self.type = tk.StringVar(value="studio_album")
-        self.date = tk.StringVar()
-        self.downloading = tk.BooleanVar()
-        self.markers = tk.StringVar()
-        self.notes = tk.StringVar()
-
-        # Album variable boxes
-
-        album_title = tk.Entry(self.frame, width=30, textvariable=self.title)
-        album_type = tk.OptionMenu(self.frame, self.type, *["studio_album", "ep", "compilations", "covers", "singles"])
-        album_date = tk.Entry(self.frame, width=10, textvariable=self.date)
-        album_downloading = tk.Checkbutton(self.frame, text="Downloading", height=1, width=10, variable=self.downloading)
-        album_markers = tk.Entry(self.frame, width=10, textvariable=self.markers)
-        album_notes = tk.Entry(self.frame, width=40, textvariable=self.notes)
+        self.data = DataFrame(self.frame, boxes)
 
         # Save new album box
 
-        save_button = tk.Button(self.frame, text="Save", command=self.add_new_album)
-
-        for element in [album_title, album_type, album_date, album_downloading, album_markers, album_notes, save_button]:
-            element.pack(side="left")
+        tk.Button(self.frame, text="Save", command=self.add_new_album).pack(side="left")
 
 
     def add_new_album(self):
@@ -168,10 +187,10 @@ class NewAlbumFrame:
             self.send_response_message("You have not selected an artist!")
             return
 
-        if self.title.get().strip() == "":
+        if self.data.title.get().strip() == "":
             self.send_response_message("No title selected")
 
-        if not self.date.get().isdigit():
+        if not self.data.date.get().isdigit():
             self.send_response_message("Date is invalid!")
             return
 
@@ -180,22 +199,22 @@ class NewAlbumFrame:
         for album in self.selected_artist.albums:
             artist_album_list.append(album.title.lower())
 
-        if self.title.get().strip().lower() in artist_album_list:
+        if self.data.title.get().strip().lower() in artist_album_list:
             self.send_response_message("Album already exists")
             return
 
-        new_album = Album(self.title.get().strip(), self.type.get(), int(self.date.get()), self.downloading.get(),
-                          markers=self.markers.get(), notes=self.notes.get())
+        new_album = Album(self.data.title.get().strip(), self.data.type.get(), int(self.data.date.get()),
+                          self.data.downloading.get(), markers=self.data.markers.get(), notes=self.data.notes.get())
 
         self.selected_artist.albums.append(new_album)
         new_frame = AlbumDataFrame(self.album_data_parent_frame, new_album, self.selected_artist, self.album_frames_list)
         self.album_frames_list.append(new_frame)
 
-        self.title.set("")
-        self.date.set("")
-        self.downloading.set(False)
-        self.markers.set("")
-        self.notes.set("")
+        self.data.title.set("")
+        self.data.date.set("")
+        self.data.downloading.set(False)
+        self.data.markers.set("")
+        self.data.notes.set("")
 
 
 class DataEditingPanel:
@@ -300,24 +319,25 @@ class DataEditingPanel:
         for album_frame in  self.album_frames: # Get each album displayed in the editing panel
             album = self.selected_artist.get_album(album_frame.original_title)
 
-            album.title = album_frame.title.get().strip()
-            album.type = album_frame.type.get().strip()
-            if album_frame.date.get().isdigit():
-                album.date = int(album_frame.date.get())
+            album.title = album_frame.data.title.get().strip() # todo, make sure this title doesn't exist anywhere else!
+            album.type = album_frame.data.type.get().strip()
+            album.type = album_frame.data.type.get().strip()
+            if album_frame.data.date.get().isdigit():
+                album.date = int(album_frame.data.date.get())
             else:
                 self.send_response_message("Date format is not valid")
                 return
 
-            album.downloading = album_frame.downloading.get()
-            album.downloaded = album_frame.downloaded.get()
-            album.tags = album_frame.tags.get()
-            album.cover = album_frame.cover.get()
-            album.replay_gain = album_frame.replay_gain.get()
-            album.server_upload = album_frame.server_upload.get()
+            album.downloading = album_frame.data.downloading.get() # todo soon we will loop through all album_frame.data variables
+            album.downloaded = album_frame.data.downloaded.get()
+            album.tags = album_frame.data.tags.get()
+            album.cover = album_frame.data.cover.get()
+            album.replay_gain = album_frame.data.replay_gain.get()
+            album.server_upload = album_frame.data.server_upload.get()
 
-            album.format = album_frame.format.get()
-            album.markers = album_frame.markers.get().strip()
-            album.notes = album_frame.notes.get().strip()
+            album.format = album_frame.data.format.get()
+            album.markers = album_frame.data.markers.get().strip()
+            album.notes = album_frame.data.notes.get().strip()
 
             new_artist = deepcopy(self.selected_artist)
             new_artist._id = None
