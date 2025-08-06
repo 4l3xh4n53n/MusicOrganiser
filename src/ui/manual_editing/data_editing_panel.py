@@ -319,8 +319,9 @@ class DataEditingPanel:
         for album_frame in  self.album_frames: # Get each album displayed in the editing panel
             album = self.selected_artist.get_album(album_frame.original_title)
 
+            # Do data checking data first, todo actually how could we store data checking values?
+
             album.title = album_frame.data.title.get().strip() # todo, make sure this title doesn't exist anywhere else!
-            album.type = album_frame.data.type.get().strip()
             album.type = album_frame.data.type.get().strip()
             if album_frame.data.date.get().isdigit():
                 album.date = int(album_frame.data.date.get())
