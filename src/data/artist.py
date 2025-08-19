@@ -8,7 +8,7 @@ class Artist:
     """
     albums = []
 
-    def __init__(self, name:str, albums:list[Album] = None, notes:str = None, markers:str = None, _id = None):
+    def __init__(self, name:str, albums:list[Album] = None, cover = None, notes:str = None, markers:str = None, _id = None):
         """
         Initialises a new Artist instance
         :param name: The name of the artist
@@ -18,6 +18,7 @@ class Artist:
         :param _id: The MongoDB _ID value, should be None when creating a new artist
         """
         self.name = name
+        self.cover = cover
         self.notes = notes
         self.markers = markers
         self.albums = []
@@ -39,7 +40,7 @@ class Artist:
             if data is None:
                 return None
 
-        return cls(name, data.get("albums"), data.get("notes"), data.get("markers"), data.get("_id"))
+        return cls(name, data.get("albums"), data.get("cover"), data.get("notes"), data.get("markers"), data.get("_id"))
 
 
     def get_album(self, name:str):
@@ -94,6 +95,7 @@ class Artist:
             "_id": self._id,
             "name": self.name,
             "albums": self.get_albums_json(),
+            "cover": self.cover,
             "notes": self.notes,
             "markers": self.markers,
         }
@@ -133,6 +135,7 @@ class Artist:
                 db.insert_one({
                     "name": self.name,
                     "albums": self.get_albums_json(),
+                    "cover": self.cover,
                     "markers": self.markers,
                     "notes": self.notes
                 })
@@ -143,6 +146,7 @@ class Artist:
                 db.replace_one({"_id": self._id},{
                     "name": self.name,
                     "albums": self.get_albums_json(),
+                    "cover": self.cover,
                     "markers": self.markers,
                     "notes": self.notes
                 })

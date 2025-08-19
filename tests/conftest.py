@@ -53,6 +53,7 @@ sample_artist = {
     "_id": None,
     "name": "test_name",
     "albums": [],
+    "cover": False,
     "markers": "",
     "notes": "Test notes"
 }
@@ -69,6 +70,7 @@ def make_test_artist(**overrides):
     return Artist(
         artist.get("name"),
         artist.get("albums"),
+        artist.get("cover"),
         artist.get("notes"),
         artist.get("markers")
     )

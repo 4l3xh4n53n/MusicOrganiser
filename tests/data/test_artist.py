@@ -14,7 +14,7 @@ class TestArtist:
         data from the database and build an Artist object using that data.
         """
         setup_mock_db(mocker, patch_target,
-                      {"name": "test_name", "albums": [],"notes": "Test notes", "markers": "G,E"})
+                      {"name": "test_name", "cover": False, "albums": [],"notes": "Test notes", "markers": "G,E"})
 
         result = Artist.from_database("test_name")
 
