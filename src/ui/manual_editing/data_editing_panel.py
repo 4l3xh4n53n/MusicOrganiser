@@ -257,6 +257,7 @@ class DataEditingPanel:
         # Artist Variables
 
         self.name = tk.StringVar(value="")
+        self.cover = tk.BooleanVar(value=False)
         self.markers = tk.StringVar(value="")
         self.notes = tk.StringVar(value="")
 
@@ -268,6 +269,7 @@ class DataEditingPanel:
         tk.Label(artist_information, text="Artist Data: ").pack(side="left")
 
         tk.Entry(artist_information, width=30, textvariable=self.name).pack(side="left")
+        tk.Checkbutton(artist_information, text="Cover", width=30, variable=self.cover).pack(side="left")
         tk.Entry(artist_information, width=4, textvariable=self.markers).pack(side="left")
         tk.Entry(artist_information, width=50, textvariable=self.notes).pack(side="left")
         tk.Button(artist_information, text="Delete Artist", command=self.delete_artist).pack(side="left")
@@ -306,6 +308,8 @@ class DataEditingPanel:
         # Set the Artist Data
 
         self.selected_artist.name = self.name.get()
+        self.selected_artist.cover = self.cover.get()
+        print(f"Cover: {self.cover.get()}")
         self.selected_artist.markers = self.markers.get()
         self.selected_artist.notes = self.notes.get()
 
@@ -395,6 +399,7 @@ class DataEditingPanel:
         # Set the Entry box variables to artist data
 
         self.name.set(self.selected_artist.name)
+        self.cover.set(self.selected_artist.cover)
         if self.selected_artist.markers is not None:
             self.markers.set(self.selected_artist.markers)
         if self.selected_artist.notes is not None:
