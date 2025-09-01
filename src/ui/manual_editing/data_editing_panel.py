@@ -6,6 +6,7 @@ from src.data.artist import Artist
 from src.data.artist_storage import get_artist, cache_artist, un_cache_artist
 from src.data.database import get_artist_list, remove_from_artist_list, add_to_artist_list
 from src.features.folder_structure import generate_folder_structure
+from src.ui.album_processing.album_processor import make_window
 
 
 class AlbumDataFrame:
@@ -23,6 +24,7 @@ class AlbumDataFrame:
         :param parent_frame: The root object that the list of Albums will be displayed in
         :param album: The Album object which data is going to be displayed and modified
         """
+        self.album = album
         self.album_frame_list = album_frame_list
         self.selected_artist = selected_artist
         self.original_title = album.title # This is used to identify the album later in-case the title changes
@@ -79,6 +81,9 @@ class AlbumDataFrame:
         delete_button = tk.Button(self.frame, text="Delete", command=self.delete_album)
         delete_button.pack(side="left")
 
+        organise_button = tk.Button(self.frame, text="Organise", command=self.organise_album)
+        organise_button.pack(side="left")
+
         # Set the background of each button to change
 
         for check_value, check_box in [(self.downloading,album_downloading),
@@ -95,6 +100,10 @@ class AlbumDataFrame:
                 check_box.config(bg="green", activebackground="red")
             else:
                 check_box.config(bg="red", activebackground="green")
+
+
+    def organise_album(self):
+        make_window(self.selected_artist, self.album)
 
 
     def change_checkbox_colour(self, value: tk.BooleanVar, button: tk.Checkbutton):
