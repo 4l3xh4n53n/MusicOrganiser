@@ -5,6 +5,7 @@ from src.data.album import Album
 from src.data.artist import Artist
 from src.data.artist_storage import get_artist, cache_artist, un_cache_artist
 from src.data.database import get_artist_list, remove_from_artist_list, add_to_artist_list
+from src.features.folder_structure import generate_folder_structure
 
 
 class AlbumDataFrame:
@@ -272,6 +273,7 @@ class DataEditingPanel:
         tk.Checkbutton(artist_information, text="Cover", width=30, variable=self.cover).pack(side="left")
         tk.Entry(artist_information, width=4, textvariable=self.markers).pack(side="left")
         tk.Entry(artist_information, width=50, textvariable=self.notes).pack(side="left")
+        tk.Button(artist_information, text="Generate Folders", command=self.generate_folders).pack(side="left")
         tk.Button(artist_information, text="Delete Artist", command=self.delete_artist).pack(side="left")
 
         # Album Editor
@@ -283,6 +285,11 @@ class DataEditingPanel:
 
         self.new_album_creator = NewAlbumFrame(data_editor, self.album_editor, self.album_frames,
                                                self.send_response_message)
+
+
+    def generate_folders(self):
+        generate_folder_structure(self.selected_artist)
+        self.send_response_message("Generated folder structure")
 
 
     def send_response_message(self, message:str):
@@ -309,7 +316,6 @@ class DataEditingPanel:
 
         self.selected_artist.name = self.name.get()
         self.selected_artist.cover = self.cover.get()
-        print(f"Cover: {self.cover.get()}")
         self.selected_artist.markers = self.markers.get()
         self.selected_artist.notes = self.notes.get()
 
