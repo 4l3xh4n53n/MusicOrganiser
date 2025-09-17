@@ -71,12 +71,14 @@ def number_tracks(tracks):
 
     first_track_number = tracks[0]["number"]
 
-    if re.fullmatch(r'\d{2}', first_track_number) or re.fullmatch(r'\d', first_track_number):
+    digit = r'\d{1,2}'
+    letter_digit = r'[A-Z]\d'
+
+    if re.fullmatch(digit, first_track_number) or re.fullmatch(r'\d', first_track_number):
         # Tracks should be in the correct format
         tracks.sort(key=lambda x: int(x["number"]))
 
-
-    elif re.fullmatch(r'[A-Z]\d', first_track_number):
+    elif re.fullmatch(letter_digit, first_track_number):
         # Format A1, A2, B1, B2, convert to 01, 02, 03
 
         # Make sure all tracks are in order
@@ -89,40 +91,51 @@ def number_tracks(tracks):
             track["number"] = str(track_number)
             track_number += 1
 
-    elif not first_track_number or first_track_number.strip() == "":
-        # Track number probably doesn't exist, check file names
-        # Alternatively we could have hit a misnumbered track, unfortunate but an edge case
-        # This program was written to speed up the process, not fully automate it
-
-        first_track_title = tracks[0]["file"]
-
-        dash_split = r'^(?:[A-Za-z]\d{1,2}|\d{1,2})\s*-\s*.+$'
-        dot_split = r'^(?:[A-Za-z]\d{1,2}|\d{1,2})\s*\.\s*.+$'
-
-        # Check the first track to find what splits the track number and title
-
-        if re.match(dash_split, first_track_title):
-            separator = "-"
-
-        elif re.match(dot_split, first_track_title):
-            separator = "."
-
-        else:
-            return None # Filename is in an unknown format
-
-        # Apply all track numbers
-
-        for track in tracks:
-            filename = track["file"]
-            number = filename.split(separator, 1)[0].strip()
-            track["number"] = number
-
-        number_tracks(tracks)
-
     else:
         return None # Number is in an unknown format
 
     return tracks
+
+
+def split_filename(filename):
+    dash_split = r'^(?:[A-Za-z]\d{1,2}|\d{1,2})\s*-\s*.+$'
+    dot_split = r'^(?:[A-Za-z]\d{1,2}|\d{1,2})\s*\.\s*.+$'
+
+    # Check the filename to find what splits the track number and title
+
+
+    if re.match(dash_split, filename):
+        separator = "-"
+
+    elif re.match(dot_split, filename):
+        separator = "."
+
+    else:
+        return None  # Filename is in an unknown format
+
+    return filename.split(separator, 1)
+
+
+def get_number_from_filename(filename):
+    split_result = split_filename(filename.strip())
+    if split_result is None:
+        return None # Cannot find track number in filename
+    number = split_result[0].strip()
+    return number
+
+
+def get_title_from_filename(filename):
+    split_result = split_filename(filename.strip())
+    if split_result is None:
+        # There is no track number the filename is [title].[extension]
+        title = filename.rsplit(".", 1)[0].strip()
+
+    else:
+        # There is a track number, filename is [track] - [title].[extension]
+        title_with_extension = split_result[1]
+        title = title_with_extension.rsplit(".", 1)[0].strip()
+
+    return title
 
 
 def title_tracks(tracks):
@@ -167,7 +180,7 @@ def tag_tracks(artist, album):
         tracks = number_tracks(tracks)
 
         # make new file names
-        # display those and wait for confirmation
+        # display those and wait for confirmation (showing original)
 
         # set artist
         # set album
