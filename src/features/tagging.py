@@ -65,6 +65,49 @@ def get_files(directory):
     return files
 
 
+def get_track_container(filename):
+    return filename.rsplit(".", 1)[1].strip()
+
+
+def split_filename(filename):
+    dash_split = r'^(?:[A-Za-z]\d{1,2}|\d{1,2})\s*-\s*.+$'
+    dot_split = r'^(?:[A-Za-z]\d{1,2}|\d{1,2})\s*\.\s*.+$'
+
+    # Check the filename to find what splits the track number and title
+
+    if re.match(dash_split, filename):
+        separator = "-"
+
+    elif re.match(dot_split, filename):
+        separator = "."
+
+    else:
+        return None  # Filename is in an unknown format
+
+    return filename.split(separator, 1)
+
+
+def get_number_from_filename(filename):
+    split_result = split_filename(filename.strip())
+    if split_result is None:
+        return None # Cannot find track number in filename
+    number = split_result[0].strip()
+    return number
+
+
+def get_title_from_filename(filename, container):
+    split_result = split_filename(filename.strip())
+    if split_result is None:
+        # There is no track number the filename is [title].[container]
+        title = filename.replace(f".{container}", "")
+
+    else:
+        # There is a track number, filename is [track] - [title].[container]
+        title = split_result[1].replace(f".{container}", "")
+
+    return title.strip()
+
+
 def number_tracks(tracks):
     # This checks the first available track to figure out the numbering format
     # I have never seen one with mixed formats
@@ -97,52 +140,16 @@ def number_tracks(tracks):
     return tracks
 
 
-def split_filename(filename):
-    dash_split = r'^(?:[A-Za-z]\d{1,2}|\d{1,2})\s*-\s*.+$'
-    dot_split = r'^(?:[A-Za-z]\d{1,2}|\d{1,2})\s*\.\s*.+$'
+def create_filenames(tracks):
 
-    # Check the filename to find what splits the track number and title
+    for track in tracks:
+        number = track["number"]
+        title = track["title"]
+        container = track["container"]
 
+        track["new_file_name"] = f"{number} - {title}.{container}" # todo Move to config file
 
-    if re.match(dash_split, filename):
-        separator = "-"
-
-    elif re.match(dot_split, filename):
-        separator = "."
-
-    else:
-        return None  # Filename is in an unknown format
-
-    return filename.split(separator, 1)
-
-
-def get_number_from_filename(filename):
-    split_result = split_filename(filename.strip())
-    if split_result is None:
-        return None # Cannot find track number in filename
-    number = split_result[0].strip()
-    return number
-
-
-def get_title_from_filename(filename):
-    split_result = split_filename(filename.strip())
-    if split_result is None:
-        # There is no track number the filename is [title].[extension]
-        title = filename.rsplit(".", 1)[0].strip()
-
-    else:
-        # There is a track number, filename is [track] - [title].[extension]
-        title_with_extension = split_result[1]
-        title = title_with_extension.rsplit(".", 1)[0].strip()
-
-    return title
-
-
-def title_tracks(tracks):
-    # ensures titles and all exist
-
-    # This might be helpful: title = first_track_title[1].rsplit(".", 1)[0].strip()
-    return True
+    return tracks
 
 
 def tag_tracks(artist, album):
@@ -166,18 +173,27 @@ def tag_tracks(artist, album):
 
         for file in files:
 
+            container = get_track_container(file)
             title = run_command(active_directory, "get title", file).replace("\n", "")
             number = run_command(active_directory, "get track", file).replace("\n", "")
 
+            if title == "":
+                title = get_title_from_filename(file, container)
+            if number == "":
+                number = get_number_from_filename(file)
+
+            # todo, if these fail, prompt to add them manually!
 
             tracks.append({
                 "file": file,
                 "title": title,
                 "number": number,
+                "container": container,
                 "new_file_name": ""
             })
 
         tracks = number_tracks(tracks)
+        tracks = create_filenames(tracks)
 
         # make new file names
         # display those and wait for confirmation (showing original)
