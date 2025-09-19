@@ -18,6 +18,22 @@ class Track:
         self.new_filename = f"{number} - {title}.{container}"
 
 
+class AlbumProcessingResult:
+
+    def __init__(self, album, sub_directory_count):
+        self.album = album
+        self.discs = [sub_directory_count]
+        self.errors = []
+
+
+    def add_disc(self, disc_number, tracks):
+        self.discs[disc_number] = tracks
+
+
+    def add_error(self, error):
+        self.errors.append(error)
+
+
 def get_sub_directories(active_folder):
     disc_number = 1
     sub_folders = []
@@ -145,6 +161,15 @@ def number_tracks(tracks):
     return tracks
 
 
+def get_disc_number(directory_name):
+    if directory_name == ".":
+        return 0 # No discs
+
+    # Directory is formatted CD 1 or CD1
+
+    return directory_name[-1]
+
+
 def tag_tracks(artist, album):
     # First check the folder exists
 
@@ -155,6 +180,8 @@ def tag_tracks(artist, album):
         return "Album folder not found"
 
     sub_directories = get_sub_directories(active_folder)
+
+    result = AlbumProcessingResult(album, len(sub_directories))
 
     for directory in sub_directories:
         active_directory = f"{active_folder}/{directory}"
@@ -172,14 +199,22 @@ def tag_tracks(artist, album):
 
             if title == "":
                 title = get_title_from_filename(file, container)
+
             if number == "":
                 number = get_number_from_filename(file)
+                if number is None:
+                    result.add_error(f"Cannot find track number for: {file}")
 
             # todo, if these fail, prompt to add them manually!
 
             tracks.append(Track(file, title, number, container))
 
         tracks = number_tracks(tracks)
+        disc_number = get_disc_number(directory)
+
+        result.add_disc(disc_number, tracks)
+
+    return result
 
         # display those and wait for confirmation (showing original)
 
@@ -189,4 +224,4 @@ def tag_tracks(artist, album):
         # set disc number
         # remove all tags which are not [artist, album, date, genre, track number
 
-    return None
+
