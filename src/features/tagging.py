@@ -8,15 +8,15 @@ from os import path
 
 from src.config import MUSIC_FOLDER
 
-"""
-Notes for later:
+class Track:
 
-first change directory (CD)
-then select file with "select" command
-then "get" to get tags (also works with names)
-or "set tagname:value" to set values 
-will need to incorporate the search of covers website
-"""
+    def __init__(self, file, title, number, container):
+        self.file = file
+        self.title = title
+        self.number = number
+        self.container = container
+        self.new_filename = f"{number} - {title}.{container}"
+
 
 def get_sub_directories(active_folder):
     disc_number = 1
@@ -112,42 +112,35 @@ def number_tracks(tracks):
     # This checks the first available track to figure out the numbering format
     # I have never seen one with mixed formats
 
-    first_track_number = tracks[0]["number"]
+    first_track_number = tracks[0].number
+
+    if first_track_number is None:
+        return None # No numbers to base off
 
     digit = r'\d{1,2}'
     letter_digit = r'[A-Z]\d'
 
     if re.fullmatch(digit, first_track_number) or re.fullmatch(r'\d', first_track_number):
         # Tracks should be in the correct format
-        tracks.sort(key=lambda x: int(x["number"]))
+        # Ensure all numbers have 2 digits, I.e. 01, 02, 03...
+        for number, track in enumerate(sorted(tracks, key=lambda x: int(x.number)), start=1):
+            track.number = f"{number:02}"
 
     elif re.fullmatch(letter_digit, first_track_number):
         # Format A1, A2, B1, B2, convert to 01, 02, 03
 
         # Make sure all tracks are in order
-        tracks.sort(key=lambda x: (x["number"][0], int(x["number"][1:])))
+        tracks.sort(key=lambda x: (x.number[0], int(x.number[1:])))
 
         # Loop through all tracks setting the track number
 
         track_number = 1
         for track in tracks:
-            track["number"] = str(track_number)
+            track.number = f"{track_number:02}"
             track_number += 1
 
     else:
         return None # Number is in an unknown format
-
-    return tracks
-
-
-def create_filenames(tracks):
-
-    for track in tracks:
-        number = track["number"]
-        title = track["title"]
-        container = track["container"]
-
-        track["new_file_name"] = f"{number} - {title}.{container}" # todo Move to config file
 
     return tracks
 
@@ -184,18 +177,10 @@ def tag_tracks(artist, album):
 
             # todo, if these fail, prompt to add them manually!
 
-            tracks.append({
-                "file": file,
-                "title": title,
-                "number": number,
-                "container": container,
-                "new_file_name": ""
-            })
+            tracks.append(Track(file, title, number, container))
 
         tracks = number_tracks(tracks)
-        tracks = create_filenames(tracks)
 
-        # make new file names
         # display those and wait for confirmation (showing original)
 
         # set artist
